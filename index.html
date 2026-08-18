@@ -350,7 +350,7 @@
      GITHUB_REPO  = the repository name
      GITHUB_BRANCH = the branch GitHub Pages deploys from
   =========================================================== */
-  var GITHUB_OWNER  = "your-github-username";
+  var GITHUB_OWNER  = "letscodesai";
   var GITHUB_REPO   = "Python-Course";
   var GITHUB_BRANCH = "main";
 
@@ -358,7 +358,6 @@
   var QUIZZES_PATH = "Quizzes";
 
   var API_BASE   = "https://api.github.com/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/";
-  var CACHE_KEY  = "pyCourseLibraryCache_v1";
   var CACHE_TTL  = 5 * 60 * 1000; // 5 minutes — avoids re-hitting the API on every reload
 
   /* ---------- helpers ---------- */
@@ -441,23 +440,29 @@
   }
 
   /* ---------- cache ---------- */
-  function readCache(){
+  /* Each section is cached separately, and only when it actually has
+     content — this way a misconfigured or empty result never gets
+     "stuck" in the cache; it will simply retry on the next load. */
+  function readSectionCache(key){
     try{
-      var raw = localStorage.getItem(CACHE_KEY);
+      var raw = localStorage.getItem(key);
       if(!raw) return null;
       var parsed = JSON.parse(raw);
       if(Date.now() - parsed.timestamp > CACHE_TTL) return null;
-      return parsed;
+      return parsed.items;
     }catch(e){ return null; }
   }
-  function writeCache(notes, quizzes){
+  function writeSectionCache(key, items){
     try{
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), notes: notes, quizzes: quizzes }));
+      if(!items || !items.length) return;
+      localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), items: items }));
     }catch(e){ /* storage unavailable — safe to ignore */ }
   }
+  var NOTES_CACHE_KEY = "pyCourseNotesCache_v2";
+  var QUIZZES_CACHE_KEY = "pyCourseQuizzesCache_v2";
 
   /* ---------- rendering ---------- */
-  function renderGrid(container, items, ok){
+  function renderGrid(container, items, ok, debugUrl){
     if(!ok){
       container.innerHTML =
         '<div class="empty-state">' +
@@ -470,7 +475,8 @@
       container.innerHTML =
         '<div class="empty-state">' +
           '<h3>Nothing published here yet</h3>' +
-          '<p>Coming soon...</p>' +
+          '<p>This section will list pages automatically as they are committed to the repository.</p>' +
+          '<p style="margin-top:10px;"><a href="' + debugUrl + '" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:12px;">Check the raw API response ↗</a> — if that shows "Not Found", double-check GITHUB_OWNER, GITHUB_REPO and GITHUB_BRANCH at the top of the script.</p>' +
         '</div>';
       return;
     }
@@ -495,8 +501,10 @@
   }
 
   function paint(notes, quizzes, notesOk, quizzesOk){
-    renderGrid(notesGrid, notes, notesOk);
-    renderGrid(quizzesGrid, quizzes, quizzesOk);
+    var notesDebugUrl = API_BASE + encodeURIComponent(NOTES_PATH) + "?ref=" + GITHUB_BRANCH;
+    var quizzesDebugUrl = API_BASE + encodeURIComponent(QUIZZES_PATH) + "?ref=" + GITHUB_BRANCH;
+    renderGrid(notesGrid, notes, notesOk, notesDebugUrl);
+    renderGrid(quizzesGrid, quizzes, quizzesOk, quizzesDebugUrl);
     notesCount.textContent = notes.length ? "(" + notes.length + ")" : "";
     quizzesCount.textContent = quizzes.length ? "(" + quizzes.length + ")" : "";
   }
@@ -507,13 +515,13 @@
   var quizzesCount = document.getElementById("quizzesCount");
 
   /* show cached results immediately if we have them, then refresh in the background */
-  var cached = readCache();
-  if(cached){
-    paint(cached.notes, cached.quizzes, true, true);
-  } else {
-    showLoading(notesGrid);
-    showLoading(quizzesGrid);
+  var cachedNotes = readSectionCache(NOTES_CACHE_KEY);
+  var cachedQuizzes = readSectionCache(QUIZZES_CACHE_KEY);
+  if(cachedNotes || cachedQuizzes){
+    paint(cachedNotes || [], cachedQuizzes || [], true, true);
   }
+  if(!cachedNotes) showLoading(notesGrid);
+  if(!cachedQuizzes) showLoading(quizzesGrid);
 
   Promise.all([fetchFolderFiles(NOTES_PATH), fetchFolderFiles(QUIZZES_PATH)])
     .then(function(results){
@@ -526,11 +534,12 @@
         var notes = built[0];
         var quizzes = built[1];
         paint(notes, quizzes, notesResult.ok, quizzesResult.ok);
-        if(notesResult.ok && quizzesResult.ok) writeCache(notes, quizzes);
+        if(notesResult.ok) writeSectionCache(NOTES_CACHE_KEY, notes);
+        if(quizzesResult.ok) writeSectionCache(QUIZZES_CACHE_KEY, quizzes);
       });
     })
     .catch(function(){
-      if(!cached) paint([], [], false, false);
+      if(!cachedNotes && !cachedQuizzes) paint([], [], false, false);
     });
 
   /* ---------- tabs ---------- */
