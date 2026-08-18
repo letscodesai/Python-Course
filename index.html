@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Course — Notes &amp; Quizzes</title>
+<meta name="description" content="Notes and quizzes for a Python programming course, organised by topic.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper: #F5F7F1;
+    --paper-dim: #E9EEE3;
+    --ink: #1B2430;
+    --ink-soft: #4B5768;
+    --ink-faint: #7C879A;
+    --amber: #F2B705;
+    --amber-ink: #4A3A00;
+    --teal: #1F958A;
+    --teal-soft: #E4F5F3;
+    --coral: #E75C4B;
+    --card: #FFFFFF;
+    --line: #DDE3D6;
+
+    --display: "Space Grotesk", sans-serif;
+    --body: "Lora", Georgia, serif;
+    --mono: "JetBrains Mono", "Courier New", monospace;
+
+    --maxw: 1000px;
+    --radius: 16px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--amber); color: var(--ink); }
+  a{ color: var(--teal); }
+  :focus-visible{ outline: 3px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+
+  h1, h2, h3, h4{
+    font-family: var(--display);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  p{ margin: 0 0 1em 0; }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .accent-bar{
+    height: 5px;
+    background: linear-gradient(90deg, var(--teal), var(--amber), var(--coral));
+  }
+
+  /* ---------------- top bar ---------------- */
+  .topbar{
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 22px 24px 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--display);
+  }
+  .topbar .brand{
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .topbar .brand .dot{
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 4px var(--teal-soft);
+  }
+  .topbar nav{ display:flex; gap: 22px; font-size: 14px; font-weight: 600; }
+  .topbar nav button{
+    background:none; border:none; cursor:pointer;
+    font-family: var(--display); font-weight: 600; font-size: 14px;
+    color: var(--ink-soft); padding: 0;
+  }
+  .topbar nav button:hover{ color: var(--teal); }
+
+  /* ---------------- hero ---------------- */
+  .hero{
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 60px 24px 30px 24px;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .hero .eyebrow{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+  .hero h1{
+    font-size: clamp(2rem, 4.4vw, 3.1rem);
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .hero h1 .accent{ color: var(--teal); }
+  .hero .lede{
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    max-width: 54ch;
+    margin-bottom: 0;
+  }
+
+  /* hero terminal */
+  .terminal{
+    background: var(--ink);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 18px 40px -18px rgba(27,36,48,0.45);
+  }
+  .terminal-chrome{
+    display:flex; align-items:center; gap:8px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .terminal-chrome span{ width: 11px; height: 11px; border-radius: 50%; display:inline-block; }
+  .terminal-chrome span:nth-child(1){ background:#E75C4B; }
+  .terminal-chrome span:nth-child(2){ background:#F2B705; }
+  .terminal-chrome span:nth-child(3){ background:#1F958A; }
+  .terminal-title{ margin-left: 8px; font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.5); }
+  .terminal-body{
+    padding: 22px 20px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #E7ECE4;
+    min-height: 170px;
+  }
+  .terminal-body .line{ margin-bottom: 11px; opacity: 0; transform: translateY(4px); animation: lineIn 0.4s ease forwards; }
+  .terminal-body .prompt{ color: #7FD9CF; }
+  .terminal-body .out{ color: #F2C879; }
+  @keyframes lineIn{ to{ opacity:1; transform: translateY(0); } }
+
+  /* ---------------- library section ---------------- */
+  .section{ padding: 20px 0 64px 0; }
+
+  .tab-row{
+    display:flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tab-btn{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-faint);
+    padding: 12px 6px 14px 6px;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .tab-btn:hover{ color: var(--ink); }
+  .tab-btn.active{ color: var(--ink); border-bottom-color: var(--teal); }
+  .tab-btn .count{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-left: 6px;
+  }
+
+  .tab-panel[hidden]{ display:none; }
+
+  /* chapter / quiz cards */
+  .item-grid{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .item-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 20px;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .item-card:hover{ border-color: var(--teal); transform: translateY(-2px); }
+  .item-card .num{
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--teal);
+    background: var(--teal-soft);
+    width: 52px; height: 52px;
+    border-radius: 13px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .item-card .body h3{ font-size: 1.1rem; margin-bottom: 6px; }
+  .item-card .body p{ font-size: 0.95rem; color: var(--ink-soft); margin-bottom: 10px; }
+  .topic-tags{ display:flex; flex-wrap: wrap; gap: 6px; }
+  .topic-tags span{
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    background: var(--paper-dim);
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+  .item-card .arrow{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--teal);
+    white-space: nowrap;
+  }
+
+  .empty-state{
+    background: var(--card);
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 44px 30px;
+    text-align: center;
+  }
+  .empty-state h3{ font-size: 1.1rem; margin-bottom: 8px; color: var(--ink-soft); }
+  .empty-state p{ color: var(--ink-faint); max-width: 46ch; margin: 0 auto; }
+
+  footer{ padding: 40px 0 60px 0; text-align: center; border-top: 1px solid var(--line); }
+  footer .wrap{ display:flex; flex-direction:column; align-items:center; gap: 8px; }
+  footer .brand{ font-family: var(--display); font-weight: 700; font-size: 14px; display:flex; align-items:center; gap:8px; }
+  footer .brand .dot{ width: 8px; height:8px; border-radius:50%; background: var(--amber); }
+  footer p{ margin:0; color: var(--ink-faint); font-size: 13.5px; }
+  footer .club-credit{
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+  }
+  footer .club-credit strong{
+    font-family: var(--display);
+    color: var(--teal);
+    font-weight: 700;
+  }
+
+  @media (max-width: 820px){
+    .hero{ grid-template-columns: 1fr; padding-top: 40px; }
+    .item-card{ grid-template-columns: 44px 1fr; }
+    .item-card .arrow{ display:none; }
+    body{ font-size: 17px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    .terminal-body .line{ opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="accent-bar"></div>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Python Course</div>
+  <nav>
+    <button type="button" data-goto="notes">Notes</button>
+    <button type="button" data-goto="quizzes">Quizzes</button>
+  </nav>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div>
+    <div class="eyebrow">Python Programming Course</div>
+    <h1>Notes and quizzes for <span class="accent">learning Python.</span></h1>
+    <p class="lede">This course covers the Python programming language topic by topic — starting with how computers execute instructions, and building up to writing complete programs. Each topic has a dedicated notes page, with quizzes added as they are published.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-chrome">
+      <span></span><span></span><span></span>
+      <span class="terminal-title">python_course.py</span>
+    </div>
+    <div class="terminal-body" id="termBody"></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ LIBRARY: NOTES / QUIZZES ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="tab-row" role="tablist">
+      <button class="tab-btn active" id="tabBtnNotes" data-tab="notes" role="tab" aria-selected="true">Notes<span class="count" id="notesCount"></span></button>
+      <button class="tab-btn" id="tabBtnQuizzes" data-tab="quizzes" role="tab" aria-selected="false">Quizzes<span class="count" id="quizzesCount"></span></button>
+    </div>
+
+    <div class="tab-panel" id="panel-notes" role="tabpanel">
+      <div class="item-grid" id="notesGrid"></div>
+    </div>
+
+    <div class="tab-panel" id="panel-quizzes" role="tabpanel" hidden>
+      <div class="item-grid" id="quizzesGrid"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> Python Course</div>
+    <p>Notes and quizzes for the Python programming course.</p>
+    <p class="club-credit">A <strong>CodeCraft Club</strong> initiative</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===========================================================
+     CONFIG — edit these two lines to match your repository.
+     GITHUB_OWNER = your GitHub username or organisation
+     GITHUB_REPO  = the repository name
+     GITHUB_BRANCH = the branch GitHub Pages deploys from
+  =========================================================== */
+  var GITHUB_OWNER  = "your-github-username";
+  var GITHUB_REPO   = "Python-Course";
+  var GITHUB_BRANCH = "main";
+
+  var NOTES_PATH   = "Notes";
+  var QUIZZES_PATH = "Quizzes";
+
+  var API_BASE   = "https://api.github.com/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/";
+  var CACHE_KEY  = "pyCourseLibraryCache_v1";
+  var CACHE_TTL  = 5 * 60 * 1000; // 5 minutes — avoids re-hitting the API on every reload
+
+  /* ---------- helpers ---------- */
+  function humanize(filename){
+    var name = filename.replace(/\.html?$/i, "").replace(/[-_]+/g, " ").trim();
+    return name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  }
+
+  function extractNumber(filename, fallbackIndex){
+    var m = filename.match(/(\d+)/);
+    return m ? m[1].padStart(2, "0") : String(fallbackIndex + 1).padStart(2, "0");
+  }
+
+  function extractSortKey(filename){
+    var m = filename.match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 9999;
+  }
+
+  /* Fetch the list of .html files inside a repo folder.
+     A missing folder (404) is treated as "nothing published yet", not an error. */
+  function fetchFolderFiles(path){
+    var url = API_BASE + encodeURIComponent(path) + "?ref=" + GITHUB_BRANCH;
+    return fetch(url, { headers: { "Accept": "application/vnd.github+json" } })
+      .then(function(res){
+        if(res.status === 404) return { ok: true, files: [] };
+        if(!res.ok) return { ok: false, files: [] };
+        return res.json().then(function(data){
+          if(!Array.isArray(data)) return { ok: false, files: [] };
+          var files = data.filter(function(f){
+            return f.type === "file" && /\.html?$/i.test(f.name) && f.name.toLowerCase() !== "index.html";
+          });
+          return { ok: true, files: files };
+        });
+      })
+      .catch(function(){ return { ok: false, files: [] }; });
+  }
+
+  /* Read a page's own <title> and <meta name="description"> so cards
+     show real content instead of a guessed filename. */
+  function fetchPageMeta(file){
+    return fetch(file.download_url)
+      .then(function(res){ return res.ok ? res.text() : ""; })
+      .then(function(html){
+        var title = humanize(file.name);
+        var description = "";
+        if(html){
+          var doc = new DOMParser().parseFromString(html, "text/html");
+          var titleTag = doc.querySelector("title");
+          var descTag = doc.querySelector('meta[name="description"]');
+          if(titleTag && titleTag.textContent.trim()){
+            title = titleTag.textContent.split(" — ")[0].split(" - ")[0].trim();
+          }
+          if(descTag && descTag.getAttribute("content")){
+            description = descTag.getAttribute("content").trim();
+          }
+        }
+        return { title: title, description: description };
+      })
+      .catch(function(){
+        return { title: humanize(file.name), description: "" };
+      });
+  }
+
+  function buildItems(path, files){
+    var promises = files.map(function(file, i){
+      return fetchPageMeta(file).then(function(meta){
+        return {
+          num: extractNumber(file.name, i),
+          sortKey: extractSortKey(file.name),
+          title: meta.title,
+          description: meta.description || "Open this page to see what it covers.",
+          href: path + "/" + file.name
+        };
+      });
+    });
+    return Promise.all(promises).then(function(items){
+      items.sort(function(a, b){ return a.sortKey - b.sortKey; });
+      return items;
+    });
+  }
+
+  /* ---------- cache ---------- */
+  function readCache(){
+    try{
+      var raw = localStorage.getItem(CACHE_KEY);
+      if(!raw) return null;
+      var parsed = JSON.parse(raw);
+      if(Date.now() - parsed.timestamp > CACHE_TTL) return null;
+      return parsed;
+    }catch(e){ return null; }
+  }
+  function writeCache(notes, quizzes){
+    try{
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), notes: notes, quizzes: quizzes }));
+    }catch(e){ /* storage unavailable — safe to ignore */ }
+  }
+
+  /* ---------- rendering ---------- */
+  function renderGrid(container, items, ok){
+    if(!ok){
+      container.innerHTML =
+        '<div class="empty-state">' +
+          '<h3>Couldn\'t load this automatically</h3>' +
+          '<p>The page couldn\'t reach GitHub to list files just now. Refresh the page, or check that the repository is public.</p>' +
+        '</div>';
+      return;
+    }
+    if(!items.length){
+      container.innerHTML =
+        '<div class="empty-state">' +
+          '<h3>Nothing published here yet</h3>' +
+          '<p>This section will list pages automatically as they are committed to the repository.</p>' +
+        '</div>';
+      return;
+    }
+    container.innerHTML = "";
+    items.forEach(function(it){
+      var a = document.createElement("a");
+      a.className = "item-card";
+      a.href = it.href;
+      a.innerHTML =
+        '<div class="num">' + it.num + '</div>' +
+        '<div class="body">' +
+          '<h3>' + it.title + '</h3>' +
+          '<p>' + it.description + '</p>' +
+        '</div>' +
+        '<div class="arrow">Open →</div>';
+      container.appendChild(a);
+    });
+  }
+
+  function showLoading(container){
+    container.innerHTML = '<div class="empty-state"><h3>Loading…</h3><p>Fetching the latest pages from the repository.</p></div>';
+  }
+
+  function paint(notes, quizzes, notesOk, quizzesOk){
+    renderGrid(notesGrid, notes, notesOk);
+    renderGrid(quizzesGrid, quizzes, quizzesOk);
+    notesCount.textContent = notes.length ? "(" + notes.length + ")" : "";
+    quizzesCount.textContent = quizzes.length ? "(" + quizzes.length + ")" : "";
+  }
+
+  var notesGrid = document.getElementById("notesGrid");
+  var quizzesGrid = document.getElementById("quizzesGrid");
+  var notesCount = document.getElementById("notesCount");
+  var quizzesCount = document.getElementById("quizzesCount");
+
+  /* show cached results immediately if we have them, then refresh in the background */
+  var cached = readCache();
+  if(cached){
+    paint(cached.notes, cached.quizzes, true, true);
+  } else {
+    showLoading(notesGrid);
+    showLoading(quizzesGrid);
+  }
+
+  Promise.all([fetchFolderFiles(NOTES_PATH), fetchFolderFiles(QUIZZES_PATH)])
+    .then(function(results){
+      var notesResult = results[0];
+      var quizzesResult = results[1];
+      return Promise.all([
+        notesResult.ok ? buildItems(NOTES_PATH, notesResult.files) : Promise.resolve([]),
+        quizzesResult.ok ? buildItems(QUIZZES_PATH, quizzesResult.files) : Promise.resolve([])
+      ]).then(function(built){
+        var notes = built[0];
+        var quizzes = built[1];
+        paint(notes, quizzes, notesResult.ok, quizzesResult.ok);
+        if(notesResult.ok && quizzesResult.ok) writeCache(notes, quizzes);
+      });
+    })
+    .catch(function(){
+      if(!cached) paint([], [], false, false);
+    });
+
+  /* ---------- tabs ---------- */
+  var tabBtnNotes = document.getElementById('tabBtnNotes');
+  var tabBtnQuizzes = document.getElementById('tabBtnQuizzes');
+  var panelNotes = document.getElementById('panel-notes');
+  var panelQuizzes = document.getElementById('panel-quizzes');
+
+  function showTab(tab){
+    var isNotes = tab === 'notes';
+    tabBtnNotes.classList.toggle('active', isNotes);
+    tabBtnQuizzes.classList.toggle('active', !isNotes);
+    tabBtnNotes.setAttribute('aria-selected', isNotes ? 'true' : 'false');
+    tabBtnQuizzes.setAttribute('aria-selected', !isNotes ? 'true' : 'false');
+    panelNotes.hidden = !isNotes;
+    panelQuizzes.hidden = isNotes;
+  }
+
+  tabBtnNotes.addEventListener('click', function(){ showTab('notes'); });
+  tabBtnQuizzes.addEventListener('click', function(){ showTab('quizzes'); });
+
+  document.querySelectorAll('[data-goto]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var tab = btn.getAttribute('data-goto');
+      showTab(tab);
+      document.querySelector('.section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  /* ---------------- hero terminal ---------------- */
+  var termBody = document.getElementById('termBody');
+  var lines = [
+    { html: '<span class="prompt">&gt;&gt;&gt;</span> print("Welcome to the Python Course")', cls:'' },
+    { html: 'Welcome to the Python Course', cls:'out' },
+    { html: '<span class="prompt">&gt;&gt;&gt;</span> print("Browse the notes below to get started")', cls:'' },
+    { html: 'Browse the notes below to get started', cls:'out' }
+  ];
+  lines.forEach(function(l, i){
+    var d = document.createElement('div');
+    d.className = 'line' + (l.cls ? (' ' + l.cls) : '');
+    d.style.animationDelay = (i * 0.32) + 's';
+    d.innerHTML = l.html;
+    termBody.appendChild(d);
+  });
+
+})();
+</script>
+</body>
+</html>
