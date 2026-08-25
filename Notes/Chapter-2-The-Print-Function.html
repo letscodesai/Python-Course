@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 2 · The print() Function — Python Notes</title>
+<meta name="description" content="Chapter 2 of the Python course: how print() works, single vs double quotes, the sep and end parameters, escape sequences like \n and \t, and a small output-only chatbot project with checkable challenges.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper: #F5F7F1;
+    --paper-dim: #E9EEE3;
+    --ink: #1B2430;
+    --ink-soft: #4B5768;
+    --ink-faint: #7C879A;
+    --amber: #F2B705;
+    --amber-ink: #4A3A00;
+    --amber-soft: rgba(242,183,5,0.16);
+    --teal: #1F958A;
+    --teal-soft: #E4F5F3;
+    --coral: #E75C4B;
+    --coral-soft: #FDE9E6;
+    --card: #FFFFFF;
+    --line: #DDE3D6;
+
+    --display: "Space Grotesk", sans-serif;
+    --body: "Lora", Georgia, serif;
+    --mono: "JetBrains Mono", "Courier New", monospace;
+
+    --maxw: 880px;
+    --radius: 16px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--amber); color: var(--ink); }
+  a{ color: var(--teal); }
+  :focus-visible{ outline: 3px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+
+  h1, h2, h3, h4{
+    font-family: var(--display);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  p{ margin: 0 0 1em 0; }
+  code{ font-family: var(--mono); background: var(--paper-dim); padding: 2px 6px; border-radius: 5px; font-size: 0.9em; }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------------- progress bar ---------------- */
+  .progress-track{ position: fixed; top:0; left:0; right:0; height:4px; background: var(--paper-dim); z-index:100; }
+  .progress-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--teal), var(--amber)); transition: width 0.08s linear; }
+
+  /* ---------------- top bar ---------------- */
+  .topbar{ max-width: var(--maxw); margin: 0 auto; padding: 22px 24px 0 24px; display:flex; align-items:center; justify-content:space-between; font-family: var(--display); }
+  .topbar .brand{ font-weight:700; font-size:15px; letter-spacing:0.02em; display:flex; align-items:center; gap:8px; }
+  .topbar .brand .dot{ width:9px; height:9px; border-radius:50%; background: var(--amber); box-shadow: 0 0 0 4px var(--teal-soft); }
+  .topbar .back-link{ font-size: 13px; font-weight: 600; color: var(--ink-faint); text-decoration:none; }
+  .topbar .back-link:hover{ color: var(--teal); }
+
+  /* ---------------- hero ---------------- */
+  .hero{ max-width: var(--maxw); margin:0 auto; padding: 56px 24px 40px 24px; }
+  .hero .eyebrow{ font-family: var(--mono); font-size:13px; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:14px; }
+  .hero h1{ font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight:700; margin-bottom:18px; }
+  .hero h1 .accent{ color: var(--teal); }
+  .hero .lede{ font-size: 1.15rem; color: var(--ink-soft); max-width: 62ch; margin-bottom: 30px; }
+
+  /* ---------------- shared: dark terminal-style box ---------------- */
+  .darkbox{ background: var(--ink); border-radius: var(--radius); overflow:hidden; box-shadow: 0 18px 40px -18px rgba(27,36,48,0.4); margin: 20px 0; }
+  .darkbox-chrome{ display:flex; align-items:center; gap:8px; padding: 12px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .darkbox-chrome span{ width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .darkbox-chrome span:nth-child(1){ background:#E75C4B; }
+  .darkbox-chrome span:nth-child(2){ background:#F2B705; }
+  .darkbox-chrome span:nth-child(3){ background:#1F958A; }
+  .darkbox-title{ margin-left:8px; font-family: var(--mono); font-size:12px; color: rgba(255,255,255,0.5); }
+
+  /* hero mini-console (single line, like Chapter 1) */
+  .console-body{ padding: 18px 20px; font-family: var(--mono); font-size:14.5px; color:#E7ECE4; min-height: 110px; }
+  .console-body .line{ margin-bottom:10px; white-space: pre-wrap; word-break: break-word; }
+  .console-body .prompt{ color:#7FD9CF; }
+  .console-body .out-error{ color:#FF9086; }
+  .console-body .out-ok{ color:#B9EAC0; }
+  .console-body .hint{ color: rgba(231,236,228,0.45); }
+  .console-input-row{ display:flex; align-items:center; gap:10px; padding: 14px 20px 20px 20px; border-top:1px solid rgba(255,255,255,0.08); }
+  .console-input-row .prompt-glyph{ font-family: var(--mono); color:#7FD9CF; font-size:14.5px; }
+  .console-input-row input{ flex:1; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#F5F7F1; font-family: var(--mono); font-size:14.5px; padding:10px 12px; border-radius:8px; }
+  .console-input-row input::placeholder{ color: rgba(245,247,241,0.35); }
+  .run-btn{ font-family: var(--display); font-weight:600; font-size:13.5px; background: var(--amber); color: var(--amber-ink); border:none; padding:11px 18px; border-radius:8px; cursor:pointer; transition: transform 0.12s ease; white-space: nowrap; }
+  .run-btn:hover{ transform: translateY(-1px); }
+  .run-btn:active{ transform: translateY(0); }
+  .run-btn.check-btn{ background: var(--teal); color:#fff; }
+
+  /* ---------------- multi-line playground ---------------- */
+  .playground textarea{
+    width:100%; box-sizing:border-box; display:block;
+    background: rgba(255,255,255,0.03); border:none; resize:vertical;
+    color:#E7ECE4; font-family: var(--mono); font-size:13.5px; line-height:1.7;
+    padding: 16px 18px; min-height: 90px; outline:none;
+  }
+  .playground-actions{ display:flex; align-items:center; gap:10px; padding: 10px 18px; border-top:1px solid rgba(255,255,255,0.08); border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
+  .playground-hint{ font-family: var(--mono); font-size:11.5px; color: rgba(231,236,228,0.45); }
+  .playground-output-label{ padding: 10px 18px 0 18px; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color: rgba(231,236,228,0.4); }
+  .playground-output{
+    padding: 10px 18px 18px 18px; font-family: var(--mono); font-size:13.5px; color:#E7ECE4;
+    white-space: pre-wrap; word-break: break-word; min-height: 40px;
+    tab-size: 4; -moz-tab-size: 4;
+  }
+  .playground-output .placeholder{ color: rgba(231,236,228,0.35); }
+  .playground-output .error-line{ color:#FF9086; display:block; margin-top:8px; font-weight:600; }
+  .playground-output .error-note{ color: rgba(255,144,134,0.75); display:block; font-weight:400; font-size:12px; margin-top:4px; }
+
+  .result-banner{ margin: 0 18px 16px 18px; padding:11px 15px; border-radius:10px; font-family: var(--display); font-weight:600; font-size:13px; }
+  .result-banner.hidden{ display:none; }
+  .result-banner.pass{ background: rgba(31,149,138,0.18); color: #9CE8DC; }
+  .result-banner.fail{ background: rgba(231,92,75,0.18); color: #FFB4A8; }
+
+  /* ---------------- lesson sections ---------------- */
+  .lesson{ padding: 60px 0; border-top: 1px solid var(--line); }
+  .lesson.alt{ background: var(--paper-dim); }
+  .lesson-head{ display:flex; gap:20px; align-items:baseline; margin-bottom:24px; }
+  .lesson-num{ font-family: var(--display); font-weight:700; font-size:15px; color: var(--teal); background: var(--teal-soft); border-radius:999px; width:40px; height:40px; min-width:40px; display:flex; align-items:center; justify-content:center; }
+  .lesson-head h2{ font-size: clamp(1.4rem, 3.2vw, 1.9rem); }
+  .lesson-intro{ color: var(--ink-soft); max-width: 68ch; font-size: 1.03rem; margin-bottom: 22px; }
+
+  /* two-column layout, used wherever text pairs well with a visual */
+  .split-2{ display:grid; grid-template-columns: 1fr 1fr; gap:22px; align-items:start; margin: 18px 0; }
+  .split-2 p{ font-size: 0.98rem; }
+
+  /* term cards (definitions / cheat sheet) */
+  .term-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; }
+  .term-grid.compact{ grid-template-columns: repeat(3, 1fr); }
+  .term-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .term-card h3{ font-size: 1rem; margin-bottom:6px; font-family: var(--mono); }
+  .term-card p{ font-size: 0.92rem; color: var(--ink-soft); margin-bottom:0; }
+
+  /* callouts */
+  .callout{ margin-top:20px; background: var(--coral-soft); border:1px solid rgba(231,92,75,0.25); border-radius: var(--radius); padding:16px 20px; display:flex; gap:14px; align-items:flex-start; }
+  .callout .icon{ width:24px; height:24px; min-width:24px; color: var(--coral); margin-top:2px; }
+  .callout p{ margin:0; color: var(--ink); font-size:0.95rem; }
+  .callout strong{ font-family: var(--display); }
+  .callout.teal{ background: var(--teal-soft); border-color: rgba(31,149,138,0.25); }
+  .callout.teal .icon{ color: var(--teal); }
+  .callout.amber{ background: var(--amber-soft); border-color: rgba(242,183,5,0.35); }
+  .callout.amber .icon{ color: var(--amber-ink); }
+
+  /* code compare cards */
+  .code-compare{ display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin: 18px 0; }
+  .code-card{ background: var(--ink); border-radius: var(--radius); overflow:hidden; }
+  .code-card .code-head{ display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background: rgba(255,255,255,0.04); font-family: var(--display); font-size:12.5px; font-weight:600; color:#E7ECE4; }
+  .code-card pre{ margin:0; padding:14px 14px 16px 14px; font-family: var(--mono); font-size:13px; color:#DCE7DC; overflow-x:auto; line-height:1.6; }
+  .code-card .out{ background: rgba(255,255,255,0.03); border-top:1px solid rgba(255,255,255,0.07); padding: 10px 14px; font-family: var(--mono); font-size:12.5px; color:#B9EAC0; white-space:pre-wrap; }
+  .code-card .out .lab{ color: rgba(231,236,228,0.4); font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:4px; }
+
+  /* predict-the-output cards */
+  .predict-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:20px; }
+  .predict-card .q{ font-family: var(--display); font-weight:600; font-size:0.92rem; margin-bottom:10px; color: var(--ink-soft); }
+  .predict-card pre{ background: var(--ink); color:#DCE7DC; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:12.5px; overflow-x:auto; margin:0 0 12px 0; }
+  .reveal-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--teal-soft); color: var(--teal); border:none; padding:9px 18px; border-radius:999px; cursor:pointer; }
+  .reveal-btn:hover{ filter: brightness(0.95); }
+
+  /* yes/no question cards */
+  .yesno-row{ display:flex; gap:10px; }
+  .yesno-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--paper-dim); color: var(--ink); border:1px solid var(--line); padding:9px 22px; border-radius:999px; cursor:pointer; transition: all 0.15s ease; }
+  .yesno-btn:hover{ border-color: var(--teal); }
+  .yesno-btn.chosen.correct{ background: var(--teal); color:#fff; border-color: var(--teal); }
+  .yesno-btn.chosen.incorrect{ background: var(--coral); color:#fff; border-color: var(--coral); }
+  .yesno-btn.reveal-correct{ border-color: var(--teal); color: var(--teal); font-weight:700; }
+  .verdict{ font-family: var(--display); font-weight:700; font-size:0.92rem; margin-bottom:10px; }
+  .verdict.correct{ color: var(--teal); }
+  .verdict.incorrect{ color: var(--coral); }
+  .answer-panel{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); display:none; }
+  .answer-panel.show{ display:block; }
+  .answer-panel .out-label{ font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .answer-panel pre{ background:#12261F; color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0 0 10px 0; white-space:pre-wrap; }
+  .answer-panel .explain{ font-size:0.9rem; color: var(--ink-soft); margin-bottom:0; }
+
+  /* debug cards */
+  .debug-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:22px; margin-top: 18px; }
+  .debug-card .tag{ display:inline-block; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--coral); background: var(--coral-soft); padding:3px 10px; border-radius:6px; margin-bottom:12px; }
+  .debug-card pre{ background: var(--ink); color:#DCE7DC; padding:14px 16px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0 0 10px 0; overflow-x:auto; }
+  .debug-card .err{ font-family: var(--mono); font-size:12.5px; color: var(--coral); margin-bottom:14px; }
+  .fix-panel{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); display:none; }
+  .fix-panel.show{ display:block; }
+  .fix-panel pre{ background:#12261F; color:#B9EAC0; }
+  .fix-panel .explain{ font-size:0.9rem; color: var(--ink-soft); margin-bottom:0; }
+
+  /* puzzle row (multiple items) */
+  .puzzle-row{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+  .puzzle-chip{ font-family: var(--mono); font-size:13px; background: var(--card); border:2px solid var(--teal); color: var(--ink); padding:8px 14px; border-radius:10px; }
+  .puzzle-comma{ font-family: var(--display); font-weight:700; font-size:18px; color: var(--amber-ink); }
+  .puzzle-note{ margin-top: 10px; font-size:0.88rem; color: var(--ink-faint); font-family: var(--mono); }
+
+  /* sep vs end table */
+  .compare-table{ width:100%; border-collapse: collapse; margin: 18px 0; border-radius: var(--radius); overflow:hidden; border: 1px solid var(--line); }
+  .compare-table th{ font-family: var(--display); font-size:0.9rem; padding:12px 16px; text-align:left; color:#fff; }
+  .compare-table th.empty-col{ background: var(--ink); }
+  .compare-table th.sep-col{ background: var(--teal); }
+  .compare-table th.end-col{ background: var(--amber-ink); }
+  .compare-table td{ padding:13px 16px; font-size:0.9rem; color: var(--ink-soft); border-top:1px solid var(--line); background: var(--card); vertical-align: top; }
+  .compare-table td.label{ font-family: var(--display); font-weight:600; color: var(--ink); background: var(--paper-dim); white-space:nowrap; }
+
+  /* escape sequence table */
+  .escape-table{ width:100%; border-collapse: collapse; margin: 18px 0; }
+  .escape-table th{ text-align:left; font-family: var(--display); font-size:0.85rem; color: var(--ink-faint); padding:8px 12px; border-bottom:2px solid var(--line); }
+  .escape-table td{ padding:11px 12px; border-bottom:1px solid var(--line); font-size:0.9rem; color: var(--ink-soft); vertical-align:top; }
+  .escape-table td.code{ font-family: var(--mono); font-weight:600; color: var(--teal); white-space:nowrap; }
+
+  /* challenge split layout: description beside a live editor */
+  .challenge-split{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap:22px; align-items:start; margin: 18px 0; }
+  .challenge-info h4{ font-size:1rem; margin-bottom:10px; }
+  .challenge-info p{ font-size:0.94rem; color: var(--ink-soft); }
+  .target-box{ margin-top:14px; }
+  .target-box .target-label{ display:block; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .target-box pre{ background: var(--ink); color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0; }
+
+  .challenge-reqs{ list-style:none; margin:14px 0 0 0; padding:0; display:flex; flex-direction:column; gap:9px; font-size:0.92rem; color: var(--ink-soft); }
+  .challenge-reqs li{ display:flex; align-items:flex-start; gap:8px; }
+  .challenge-reqs li::before{ content:"⬜"; flex-shrink:0; }
+  .challenge-reqs li.pass{ color: var(--teal); font-weight:600; }
+  .challenge-reqs li.pass::before{ content:"✅"; }
+
+  footer{ padding: 46px 0 70px 0; text-align:center; }
+  footer .wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  footer .brand{ font-family: var(--display); font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px; }
+  footer .brand .dot{ width:8px; height:8px; border-radius:50%; background: var(--amber); }
+  footer p{ margin:0; color: var(--ink-faint); font-size:13.5px; }
+
+  @media (max-width: 760px){
+    .term-grid, .code-compare, .split-2, .challenge-split{ grid-template-columns: 1fr; }
+    .term-grid.compact{ grid-template-columns: repeat(2, 1fr); }
+    body{ font-size:17px; }
+    .lesson{ padding: 48px 0; }
+    .compare-table{ font-size: 0.82rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Python Notes</div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="eyebrow">Chapter 2: The print() Function</div>
+  <h1>Your code is silent<br>until you tell it to <span class="accent">speak.</span></h1>
+  <p class="lede">Right now, Python can work things out, but it can't show you anything on screen unless you ask it to. <code>print()</code> is how you ask. In this chapter we'll use it properly — with several pieces of text, custom spacing, and special characters — and finish by building a tiny chatbot that only talks.</p>
+
+  <div class="darkbox">
+    <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">try_print.py</span></div>
+    <div class="console-body" id="heroBody">
+      <div class="line hint"># Type a print() statement below and press Run.</div>
+      <div class="line hint"># Try: print("Hello, World!") — then try typing hello without quotes.</div>
+    </div>
+    <div class="console-input-row">
+      <span class="prompt-glyph">&gt;&gt;&gt;</span>
+      <input type="text" id="heroInput" placeholder='print("Hello, World!")' autocomplete="off" spellcheck="false">
+      <button class="run-btn" id="heroRun" type="button">Run</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 01 MEET PRINT ============ -->
+<section class="lesson" id="meet-print">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">01</div><h2>Meet print(): Your Program's Voice</h2></div>
+    <p class="lesson-intro"><code>print()</code> is a built-in Python command that displays whatever you give it on the screen. Everything else your code does happens quietly, behind the scenes — <code>print()</code> is what actually shows up.</p>
+
+    <div class="split-2">
+      <div>
+        <p>Think of your program like a kitchen. A chef can chop, mix, and cook all day, but the customer never sees any of it — they only see what gets placed on the serving window.</p>
+        <p><code>print()</code> is that serving window. Nothing your code works out will appear on screen unless it passes through <code>print()</code> first.</p>
+      </div>
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">print_syntax.py</span></div>
+        <div style="padding: 24px 16px; font-family: var(--mono); font-size: 16px; color:#E7ECE4; text-align:center;">
+          <span style="color:#F2C879; font-weight:600;">print</span><span style="color:#DCE7DC;">(</span><span style="color:#7FD9CF;">"Hello!"</span><span style="color:#DCE7DC;">)</span>
+        </div>
+        <div style="padding: 4px 16px 18px 16px; display:flex; flex-direction:column; gap:6px;">
+          <span style="font-family:var(--mono); font-size:11px; color:#F2C879;">■ print — the command you're using</span>
+          <span style="font-family:var(--mono); font-size:11px; color:#DCE7DC;">■ ( ) — this is how you use it</span>
+          <span style="font-family:var(--mono); font-size:11px; color:#7FD9CF;">■ what's inside, in quotes — the message to display</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+      <p><strong>Try it above:</strong> type just <code>hello</code> — no quotes, no <code>print()</code>. Python replies <code>NameError: name 'hello' is not defined</code>. Without quotes, Python assumes <code>hello</code> is the name of something it should already know, and it isn't. Quotes tell Python "this is just text."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 TEXT VS NUMBERS ============ -->
+<section class="lesson alt" id="text-vs-numbers">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">02</div><h2>What Goes Inside the Parentheses</h2></div>
+    <p class="lesson-intro">You can print two kinds of things so far: <strong>text</strong> (called a <em>string</em>, always wrapped in quotes) and <strong>numbers</strong> (typed plainly, no quotes at all). They can look identical on screen, but Python treats them very differently underneath.</p>
+
+    <div class="split-2">
+      <div class="predict-card yesno-card" data-answer="yes">
+        <div class="q">Will these two lines print the exact same text?</div>
+        <pre>print(5)
+print("5")</pre>
+        <div class="yesno-row">
+          <button class="yesno-btn" data-choice="yes">Yes</button>
+          <button class="yesno-btn" data-choice="no">No</button>
+        </div>
+        <div class="answer-panel" id="ans1">
+          <div class="verdict"></div>
+          <div class="out-label">Output</div>
+          <pre>5
+5</pre>
+          <p class="explain">Identical on screen — but <code>5</code> is a number Python can do maths with, while <code>"5"</code> is just a character that looks like one.</p>
+        </div>
+      </div>
+
+      <div class="predict-card yesno-card" data-answer="no">
+        <div class="q">Will these two lines print the same result?</div>
+        <pre>print(2 + 3)
+print("2" + "3")</pre>
+        <div class="yesno-row">
+          <button class="yesno-btn" data-choice="yes">Yes</button>
+          <button class="yesno-btn" data-choice="no">No</button>
+        </div>
+        <div class="answer-panel" id="ans2">
+          <div class="verdict"></div>
+          <div class="out-label">Output</div>
+          <pre>5
+23</pre>
+          <p class="explain"><code>2 + 3</code> adds numbers, giving <code>5</code>. <code>"2" + "3"</code> joins text end to end, giving <code>"23"</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v5M12 15.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p><strong>A preview, not the full story:</strong> text vs numbers gets its own chapter later. For now, just remember: numbers have no quotes, text always does.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 SINGLE VS DOUBLE QUOTES ============ -->
+<section class="lesson" id="quotes">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">03</div><h2>Single Quotes vs Double Quotes</h2></div>
+    <p class="lesson-intro">Python gives you two ways to mark text: single quotes <code>'like this'</code> and double quotes <code>"like this"</code>. Neither is "more correct" — both give exactly the same result, as long as the quote you open with matches the one you close with.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>single_quotes.py</span></div>
+        <pre>print(<span style="color:#7FD9CF;">'Hello, World!'</span>)</pre>
+        <div class="out"><span class="lab">Output</span>Hello, World!</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>double_quotes.py</span></div>
+        <pre>print(<span style="color:#7FD9CF;">"Hello, World!"</span>)</pre>
+        <div class="out"><span class="lab">Output</span>Hello, World!</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.95rem;">So when does it matter which one you pick? Mainly when your text itself contains a quote mark.</p>
+
+    <div class="debug-card">
+      <span class="tag">Debug this</span>
+      <pre>print('It's raining today')</pre>
+      <div class="err">SyntaxError: unterminated string literal</div>
+      <p style="font-size:0.9rem; color:var(--ink-soft); margin-bottom:0;">Something about this line confuses Python. Can you spot what?</p>
+      <button class="reveal-btn" data-target="fix1" style="margin-top:14px;">Show the fix</button>
+      <div class="fix-panel" id="fix1">
+        <pre>print("It's raining today")</pre>
+        <p class="explain">The apostrophe in <em>It's</em> is a single quote character. Python reads the first <code>'</code> as the string starting, and the apostrophe inside <em>It's</em> as the string already ending — leaving the rest dangling. Switching the outer quotes to double quotes fixes it instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 MULTIPLE THINGS AT ONCE ============ -->
+<section class="lesson alt" id="multiple-args">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">04</div><h2>Printing Multiple Things at Once</h2></div>
+    <p class="lesson-intro"><code>print()</code> doesn't limit you to one thing. You can hand it several pieces, separated by commas, and it prints all of them on one line, one after another.</p>
+
+    <div class="split-2">
+      <div>
+        <div class="puzzle-row">
+          <span class="puzzle-chip">"Python"</span><span class="puzzle-comma">,</span>
+          <span class="puzzle-chip">"is"</span><span class="puzzle-comma">,</span>
+          <span class="puzzle-chip">"fun"</span>
+        </div>
+        <p class="puzzle-note">three separate pieces, joined by commas — each comma marks where one piece ends and the next begins</p>
+      </div>
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">multiple.py</span></div>
+        <div style="padding:16px 18px; font-family:var(--mono); font-size:13.5px; color:#DCE7DC;">print(<span style="color:#7FD9CF;">"Python"</span>, <span style="color:#7FD9CF;">"is"</span>, <span style="color:#7FD9CF;">"fun"</span>)</div>
+        <div style="padding:0 18px 16px 18px; font-family:var(--mono); font-size:12.5px; color:#B9EAC0; border-top:1px solid rgba(255,255,255,0.08); padding-top:10px;">Python is fun</div>
+      </div>
+    </div>
+
+    <div class="predict-card" style="margin-top:18px;">
+      <div class="q">Predict the output</div>
+      <pre>print("The answer is", 42)</pre>
+      <button class="reveal-btn" data-target="ans3">Reveal output</button>
+      <div class="answer-panel" id="ans3">
+        <div class="out-label">Output</div>
+        <pre>The answer is 42</pre>
+        <p class="explain">Text and a number, printed together with no trouble. Also notice the space between "is" and "42" that you never typed — where did that come from? That's next.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 DEFAULT BEHAVIOUR ============ -->
+<section class="lesson" id="default-behaviour">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">05</div><h2>The Default Behaviour of print()</h2></div>
+    <p class="lesson-intro"><code>print()</code> quietly does two things for you every time, unless you say otherwise: it puts a <strong>space</strong> between each piece you give it, and it moves to a <strong>new line</strong> once it's done.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>space_between.py</span></div>
+        <pre>print(<span style="color:#7FD9CF;">"Python"</span>, <span style="color:#7FD9CF;">"is"</span>, <span style="color:#7FD9CF;">"fun"</span>)</pre>
+        <div class="out"><span class="lab">Output</span>Python is fun</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>new_line.py</span></div>
+        <pre>print(<span style="color:#7FD9CF;">"First line"</span>)
+print(<span style="color:#7FD9CF;">"Second line"</span>)</pre>
+        <div class="out"><span class="lab">Output</span>First line
+Second line</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.95rem;">Neither of those is an accident — they're just Python's <strong>defaults</strong>: the settings it uses automatically when you don't specify your own. You're allowed to change both, which is exactly what the next two sections cover.</p>
+  </div>
+</section>
+
+<!-- ============ 06 SEP ============ -->
+<section class="lesson alt" id="sep">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">06</div><h2>sep: Choosing What Goes Between</h2></div>
+    <p class="lesson-intro"><code>sep</code> is a setting you can add inside <code>print()</code>'s parentheses to control what Python places <em>between</em> each piece you give it. Its default is a single space <code>" "</code> — that's why pieces normally appear with a space between them. Write <code>sep="..."</code> with whatever separator you like inside the quotes.</p>
+
+    <div class="code-card" style="max-width: 420px;">
+      <div class="code-head"><span>sep_example.py</span></div>
+      <pre>print(<span style="color:#7FD9CF;">"2026"</span>, <span style="color:#7FD9CF;">"08"</span>, <span style="color:#7FD9CF;">"23"</span>, sep=<span style="color:#7FD9CF;">"-"</span>)</pre>
+      <div class="out"><span class="lab">Output</span>2026-08-23</div>
+    </div>
+
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Your turn</h4>
+        <p>Fix the <code>sep</code> below so Python prints exactly this:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>P-Y-T-H-O-N</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgSep" style="margin:0;" data-expected="P-Y-T-H-O-N">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">sep_challenge.py</span></div>
+        <textarea class="pg-input" spellcheck="false">print("P", "Y", "T", "H", "O", "N", sep=" ")</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 END ============ -->
+<section class="lesson" id="end">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">07</div><h2>end: Choosing What Happens After</h2></div>
+    <p class="lesson-intro"><code>end</code> is a setting that controls what Python adds <em>after</em> everything you gave it has been printed. Its default is a newline <code>"\n"</code> — that's why every new <code>print()</code> normally starts on its own fresh line. Change it, and you change whether the <em>next</em> thing printed lands beside it or below it.</p>
+
+    <div class="code-card" style="max-width: 420px;">
+      <div class="code-head"><span>end_example.py</span></div>
+      <pre>print(<span style="color:#7FD9CF;">"Loading"</span>, end=<span style="color:#7FD9CF;">"..."</span>)
+print(<span style="color:#7FD9CF;">"Done!"</span>)</pre>
+      <div class="out"><span class="lab">Output</span>Loading...Done!</div>
+    </div>
+
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Your turn</h4>
+        <p>Adjust <code>end</code> below so the two lines join into exactly:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>Score: 100/100</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgEnd" style="margin:0;" data-expected="Score: 100/100">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">end_challenge.py</span></div>
+        <textarea class="pg-input" spellcheck="false">print("Score:", end="")
+print("100/100")</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+
+    <div class="callout teal">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p><strong>Remember Chapter 1?</strong> Python runs your code one line at a time, in order. <code>end</code> decides whether the <em>next</em> line's output gets glued onto the current line, or starts fresh below it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 SEP VS END ============ -->
+<section class="lesson alt" id="sep-vs-end">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">08</div><h2>sep vs end: Don't Mix Them Up</h2></div>
+    <p class="lesson-intro">Both are about spacing, but they control two completely different moments.</p>
+
+    <table class="compare-table">
+      <thead><tr><th class="empty-col"></th><th class="sep-col">sep</th><th class="end-col">end</th></tr></thead>
+      <tbody>
+        <tr><td class="label">Affects</td><td>gaps <em>between</em> the pieces, inside one <code>print()</code></td><td>what comes <em>after</em> that whole <code>print()</code> is finished</td></tr>
+        <tr><td class="label">Default</td><td><code>" "</code> — a space</td><td><code>"\n"</code> — a new line</td></tr>
+        <tr><td class="label">Analogy</td><td>the glue holding words together in one sentence</td><td>the punctuation mark placed after the whole sentence</td></tr>
+        <tr><td class="label">Only matters if…</td><td>you gave it 2 or more pieces</td><td>something else gets printed right after</td></tr>
+      </tbody>
+    </table>
+
+    <div class="predict-card">
+      <div class="q">Predict the output — both together</div>
+      <pre>print("A", "B", "C", sep="-", end=" | ")
+print("Next")</pre>
+      <button class="reveal-btn" data-target="ans4">Reveal output</button>
+      <div class="answer-panel" id="ans4">
+        <div class="out-label">Output</div>
+        <pre>A-B-C | Next</pre>
+        <p class="explain"><code>sep="-"</code> joins A, B and C with dashes. <code>end=" | "</code> replaces the usual new line, so "Next" lands right after it on the same line.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 ESCAPE SEQUENCES ============ -->
+<section class="lesson" id="escapes">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">09</div><h2>Escape Sequences: Typing the Impossible</h2></div>
+    <p class="lesson-intro">An escape sequence is a two-character combination, starting with a backslash <code>\</code>, that stands in for a character you couldn't otherwise type inside a string — either because it isn't a visible character, or because typing it directly would confuse Python.</p>
+
+    <table class="escape-table">
+      <thead><tr><th>Sequence</th><th>Means</th><th>Why you'd need it</th></tr></thead>
+      <tbody>
+        <tr><td class="code">\n</td><td>New line</td><td>You can't press Enter inside a string — this inserts a line break instead.</td></tr>
+        <tr><td class="code">\t</td><td>Tab</td><td>Adds horizontal spacing, handy for lining up columns.</td></tr>
+        <tr><td class="code">\\</td><td>One backslash</td><td>Since <code>\</code> normally starts an escape, <code>\\</code> is how you print an actual backslash.</td></tr>
+        <tr><td class="code">\"</td><td>Double quote</td><td>Lets you use <code>"</code> inside a string already wrapped in double quotes.</td></tr>
+        <tr><td class="code">\'</td><td>Single quote</td><td>Lets you use <code>'</code> inside a string already wrapped in single quotes.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="playground" id="pgEscape">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">escapes_playground.py</span></div>
+        <textarea class="pg-input" spellcheck="false">print("Name:\tAlice\nAge:\t7")</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">try adding "City:\tDelhi" as a third line</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v5M12 15.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p><strong>Notice something:</strong> one <code>print()</code> with a single <code>\n</code> inside it can produce two lines — the same result as writing two separate <code>print()</code> lines.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10 QUOTES + ESCAPING ============ -->
+<section class="lesson alt" id="quotes-escaping">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">10</div><h2>Quotation Marks and Escaping Characters</h2></div>
+    <p class="lesson-intro">Back in Section 3, we fixed a broken apostrophe by switching from single to double quotes. That works — but it's not your only option. You can keep the same quote type and simply <strong>escape</strong> the troublesome character instead.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>option_1.py</span></div>
+        <pre>print(<span style="color:#7FD9CF;">"It's raining today"</span>)</pre>
+        <div class="out"><span class="lab">Output</span>It's raining today</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>option_2.py</span></div>
+        <pre>print(<span style="color:#7FD9CF;">'It\'s raining today'</span>)</pre>
+        <div class="out"><span class="lab">Output</span>It's raining today</div>
+      </div>
+    </div>
+    <p style="font-size:0.92rem; color:var(--ink-soft);">Both print the same thing. The first switches quote type. The second keeps single quotes and uses <code>\'</code> to say "this apostrophe is part of the text, not the end of the string."</p>
+
+    <div class="debug-card">
+      <span class="tag">Debug this</span>
+      <p style="font-size:0.92rem; color:var(--ink-soft);">This line hides two problems. Edit the code below so it runs with no errors and prints exactly:</p>
+      <div class="target-box"><span class="target-label">Target output</span><pre>She said "hello" to me</pre></div>
+
+      <div class="playground darkbox" id="pgDebug10" style="margin:14px 0 0 0;" data-expected='She said "hello" to me'>
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">fix_this.py</span></div>
+        <textarea class="pg-input" spellcheck="false">print("She said "hello" to me")</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+
+      <button class="reveal-btn" data-target="fix2" style="margin-top:14px;">Show the fix</button>
+      <div class="fix-panel" id="fix2">
+        <pre>print("She said \"hello\" to me")</pre>
+        <p class="explain">The outer string starts with <code>"</code>, but <code>"hello"</code> has its own unescaped double quotes — Python reads the first of those as the string ending early. Escaping both inner quotes with <code>\"</code> tells Python they're just characters to display.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 COMBINING EVERYTHING ============ -->
+<section class="lesson" id="combining">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">11</div><h2>Putting It All Together: Formatted Output</h2></div>
+    <p class="lesson-intro">Real, useful output usually combines several of these ideas at once — multiple pieces, a custom <code>sep</code> or <code>end</code>, and a few escape sequences for layout. Here's a small receipt built entirely out of <code>print()</code>.</p>
+
+    <div class="playground" id="pgCombine">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">receipt.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="6">print("=== RECEIPT ===")
+print("Item", "Price", sep="\t")
+print("Notebook", 40, sep="\t")
+print("Pen", 10, sep="\t")
+print("----------------")
+print("Total:", 50, sep=" ")</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">edit the items, prices, or separators and run again</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12 CHATBOT PROJECT ============ -->
+<section class="lesson alt" id="chatbot">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">12</div><h2>Mini Project: A Chatbot That Only Talks</h2></div>
+    <p class="lesson-intro">Let's build the opening lines of a chatbot using nothing but <code>print()</code>. It can't listen yet — that needs <code>input()</code>, a future chapter. For now, it can only talk, so we'll format its lines like a real conversation.</p>
+
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Your challenge</h4>
+        <p>Edit the script so your chatbot's intro meets all four requirements:</p>
+        <ul class="challenge-reqs">
+          <li id="req-sep">Uses a custom <code>sep</code> somewhere</li>
+          <li id="req-end">Uses a custom <code>end</code> somewhere</li>
+          <li id="req-escape">Uses <code>\n</code> or <code>\t</code> inside one print()</li>
+          <li id="req-quote">Uses an escaped quote, <code>\"</code> or <code>\'</code></li>
+        </ul>
+      </div>
+      <div class="playground darkbox" id="pgChatbot" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">chatbot.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="7">print("🤖", "PyBot", "is starting up", sep=" ")
+print("Hello", end="! ")
+print("Welcome to Python Class 2.")
+print("I can only talk for now\nI haven't learned to listen yet.")</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn" id="chatbotCheck" type="button">Check My Bot ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+      </div>
+    </div>
+
+    <button class="reveal-btn" data-target="chatbotSample" style="margin-top:6px;">See one possible solution</button>
+    <div class="answer-panel" id="chatbotSample" style="margin-top:16px;">
+      <div class="out-label">One possible chatbot.py</div>
+      <pre>print("🤖", "PyBot", "v1.0", sep="-")
+print("Hello there", end="... ")
+print("I'm still booting up my brain!")
+print("Question 1:\tWhat's your favourite language?")
+print("Answer:\t\tPython, obviously.")
+print("(I can't hear you yet — that\'s next chapter!)")</pre>
+      <p class="explain">There's no single correct answer — as long as your script uses <code>sep</code>, <code>end</code>, an escape sequence, and an escaped quote somewhere, you've met the challenge.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13 RECAP ============ -->
+<section class="lesson" id="recap">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">13</div><h2>Chapter Recap</h2></div>
+    <p class="lesson-intro">A quick-glance reference for revising later.</p>
+
+    <div class="term-grid compact">
+      <div class="term-card"><h3>print()</h3><p>Displays whatever you give it on screen.</p></div>
+      <div class="term-card"><h3>Multiple pieces</h3><p>print() can take more than one, separated by commas.</p></div>
+      <div class="term-card"><h3>Quotes</h3><p>Mark text as a string. Single and double both work, as long as they match.</p></div>
+      <div class="term-card"><h3>sep</h3><p>What goes between the pieces. Default: a space.</p></div>
+      <div class="term-card"><h3>end</h3><p>What comes after everything is printed. Default: a new line.</p></div>
+      <div class="term-card"><h3>\n</h3><p>Inserts a new line inside a string.</p></div>
+      <div class="term-card"><h3>\t</h3><p>Inserts a tab (horizontal spacing).</p></div>
+      <div class="term-card"><h3>\\</h3><p>Prints a single literal backslash.</p></div>
+      <div class="term-card"><h3>\"</h3><p>Prints a double quote inside a double-quoted string.</p></div>
+      <div class="term-card"><h3>\'</h3><p>Prints a single quote inside a single-quoted string.</p></div>
+      <div class="term-card"><h3>NameError</h3><p>Happens when Python sees an unquoted word it doesn't recognise.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> Python Notes — Chapter 2</div>
+    <p>The print() Function</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= scroll progress ================= */
+  var fill = document.getElementById('progressFill');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop || document.body.scrollTop;
+    var height = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+    var pct = height > 0 ? (scrolled / height) * 100 : 0;
+    fill.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  /* ================= shared print() simulator ================= */
+  /* Supports: print(...) with string/number pieces, sep=, end=,
+     escape sequences \n \t \\ \" \', and realistic NameError / SyntaxError
+     simulation. One print() statement per non-blank, non-comment line. */
+
+  function processEscapes(s){
+    var out = '';
+    for(var i = 0; i < s.length; i++){
+      var c = s[i];
+      if(c === '\\' && i + 1 < s.length){
+        var next = s[i+1];
+        if(next === 'n'){ out += '\n'; i++; }
+        else if(next === 't'){ out += '\t'; i++; }
+        else if(next === '\\'){ out += '\\'; i++; }
+        else if(next === '"'){ out += '"'; i++; }
+        else if(next === "'"){ out += "'"; i++; }
+        else { out += c; }
+      } else {
+        out += c;
+      }
+    }
+    return out;
+  }
+
+  function splitTopLevel(str){
+    var tokens = [], current = '', inQuote = null, escaped = false;
+    for(var i = 0; i < str.length; i++){
+      var ch = str[i];
+      if(inQuote){
+        current += ch;
+        if(escaped){ escaped = false; }
+        else if(ch === '\\'){ escaped = true; }
+        else if(ch === inQuote){ inQuote = null; }
+      } else {
+        if(ch === '"' || ch === "'"){ inQuote = ch; current += ch; }
+        else if(ch === ','){ tokens.push(current); current = ''; }
+        else { current += ch; }
+      }
+    }
+    if(inQuote) return { error: true };
+    tokens.push(current);
+    return { error: false, tokens: tokens };
+  }
+
+  function parseStringLiteral(token){
+    if(token.length < 1) return null;
+    var quoteChar = token[0];
+    if(quoteChar !== '"' && quoteChar !== "'") return null;
+    var i = 1;
+    var content = '';
+    var closed = false;
+    for(; i < token.length; i++){
+      var ch = token[i];
+      if(ch === '\\' && i + 1 < token.length){
+        content += ch + token[i+1];
+        i++;
+        continue;
+      }
+      if(ch === quoteChar){ closed = true; i++; break; }
+      content += ch;
+    }
+    if(!closed) return null;
+    return { raw: content, rest: token.slice(i) };
+  }
+
+  function parsePrintLine(rawLine, lineNo){
+    var trimmed = rawLine.trim();
+    if(trimmed === '' || trimmed.indexOf('#') === 0){
+      return { ok: true, output: null };
+    }
+
+    var callMatch = trimmed.match(/^([A-Za-z_]\w*)\s*\(([\s\S]*)\)\s*;?\s*$/);
+    if(!callMatch){
+      if(/^[A-Za-z_]\w*$/.test(trimmed)){
+        return { ok: false, error: "NameError: name '" + trimmed + "' is not defined", note: "Line " + lineNo + " — did you forget quotes, or the print(...) part itself?" };
+      }
+      return { ok: false, error: "SyntaxError: invalid syntax", note: "Line " + lineNo + " — check your parentheses and quotes." };
+    }
+
+    var funcName = callMatch[1];
+    var inner = callMatch[2];
+
+    if(funcName !== 'print'){
+      return { ok: false, error: "NameError: name '" + funcName + "' is not defined", note: "Line " + lineNo + " — Python is case-sensitive. Did you mean print (all lowercase)?" };
+    }
+
+    var split = splitTopLevel(inner);
+    if(split.error){
+      return { ok: false, error: "SyntaxError: unterminated string literal", note: "Line " + lineNo + " — a quote was opened but never closed. Check for a stray apostrophe or quote mark." };
+    }
+
+    var positional = [];
+    var sepVal = ' ';
+    var endVal = '\n';
+
+    for(var i = 0; i < split.tokens.length; i++){
+      var token = split.tokens[i].trim();
+      if(token === '') continue;
+
+      var kwMatch = token.match(/^(sep|end)\s*=\s*([\s\S]*)$/);
+      if(kwMatch){
+        var kwParsed = parseStringLiteral(kwMatch[2].trim());
+        if(kwParsed === null || kwParsed.rest.trim() !== ''){
+          return { ok: false, error: "SyntaxError: invalid syntax", note: "Line " + lineNo + " — " + kwMatch[1] + " needs a quoted string, like " + kwMatch[1] + '="-"' };
+        }
+        var kwVal = processEscapes(kwParsed.raw);
+        if(kwMatch[1] === 'sep') sepVal = kwVal; else endVal = kwVal;
+        continue;
+      }
+
+      if(token[0] === '"' || token[0] === "'"){
+        var strParsed = parseStringLiteral(token);
+        if(strParsed === null){
+          return { ok: false, error: "SyntaxError: unterminated string literal", note: "Line " + lineNo };
+        }
+        if(strParsed.rest.trim() !== ''){
+          return { ok: false, error: "SyntaxError: invalid syntax", note: "Line " + lineNo + " — check for a stray quote mark in the middle of your text." };
+        }
+        positional.push(processEscapes(strParsed.raw));
+        continue;
+      }
+
+      if(/^-?\d+(\.\d+)?$/.test(token)){
+        positional.push(token);
+        continue;
+      }
+
+      return { ok: false, error: "NameError: name '" + token + "' is not defined", note: "Line " + lineNo + " — text needs quotes around it, like \"" + token + "\"" };
+    }
+
+    return { ok: true, output: positional.join(sepVal) + endVal };
+  }
+
+  function runCode(codeText){
+    var lines = codeText.split('\n');
+    var resultText = '';
+    var errorInfo = null;
+    for(var i = 0; i < lines.length; i++){
+      var res;
+      try{
+        res = parsePrintLine(lines[i], i + 1);
+      }catch(e){
+        res = { ok: false, error: "SyntaxError: invalid syntax", note: "Line " + (i+1) };
+      }
+      if(!res.ok){ errorInfo = res; break; }
+      if(res.output !== null && res.output !== undefined) resultText += res.output;
+    }
+    return { text: resultText, error: errorInfo };
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderOutput(outputEl, result){
+    var html = '';
+    if(result.text){ html += escapeHtml(result.text); }
+    if(result.error){
+      html += '<span class="error-line">' + escapeHtml(result.error.error) + '</span>';
+      if(result.error.note){ html += '<span class="error-note">' + escapeHtml(result.error.note) + '</span>'; }
+    }
+    outputEl.innerHTML = html || '<span class="placeholder">(no output)</span>';
+  }
+
+  /* ================= wire up every multi-line playground's Run button ================= */
+  document.querySelectorAll('.playground').forEach(function(pg){
+    var textarea = pg.querySelector('.pg-input');
+    var runBtn = pg.querySelector('.pg-run');
+    var output = pg.querySelector('.pg-output');
+    if(!textarea || !runBtn || !output) return;
+    runBtn.addEventListener('click', function(){
+      renderOutput(output, runCode(textarea.value));
+    });
+  });
+
+  /* ================= exact-match Check buttons (sep / end challenges) ================= */
+  document.querySelectorAll('.pg-check').forEach(function(btn){
+    var pg = btn.closest('.playground');
+    if(!pg) return;
+    var textarea = pg.querySelector('.pg-input');
+    var output = pg.querySelector('.pg-output');
+    var banner = pg.querySelector('.result-banner');
+    var expected = pg.getAttribute('data-expected') || '';
+
+    btn.addEventListener('click', function(){
+      var result = runCode(textarea.value);
+      renderOutput(output, result);
+      if(!banner) return;
+      banner.classList.remove('hidden', 'pass', 'fail');
+      if(result.error){
+        banner.classList.add('fail');
+        banner.textContent = '❌ There\'s an error above — fix it and check again.';
+        return;
+      }
+      var actual = (result.text || '').replace(/\n+$/, '');
+      var exp = expected.replace(/\n+$/, '');
+      if(actual === exp){
+        banner.classList.add('pass');
+        banner.textContent = '✅ Matches the target output — nicely done!';
+      } else {
+        banner.classList.add('fail');
+        banner.textContent = '❌ Not quite yet — compare your output above with the target.';
+      }
+    });
+  });
+
+  /* ================= chatbot requirements checker ================= */
+  var chatbotCheckBtn = document.getElementById('chatbotCheck');
+  if(chatbotCheckBtn){
+    chatbotCheckBtn.addEventListener('click', function(){
+      var pg = chatbotCheckBtn.closest('.playground');
+      var textarea = pg.querySelector('.pg-input');
+      var output = pg.querySelector('.pg-output');
+      var result = runCode(textarea.value);
+      renderOutput(output, result);
+
+      var code = textarea.value;
+      var reqs = [
+        { id: 'req-sep', pass: /sep\s*=/.test(code) },
+        { id: 'req-end', pass: /end\s*=/.test(code) },
+        { id: 'req-escape', pass: /\\n|\\t/.test(code) },
+        { id: 'req-quote', pass: /\\"|\\'/.test(code) }
+      ];
+      reqs.forEach(function(r){
+        var el = document.getElementById(r.id);
+        if(el) el.classList.toggle('pass', r.pass);
+      });
+    });
+  }
+
+  /* ================= yes/no question cards ================= */
+  document.querySelectorAll('.yesno-card').forEach(function(card){
+    var correctAnswer = card.getAttribute('data-answer');
+    var buttons = card.querySelectorAll('.yesno-btn');
+    var panel = card.querySelector('.answer-panel');
+    var verdictEl = panel ? panel.querySelector('.verdict') : null;
+
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var choice = btn.getAttribute('data-choice');
+        var isCorrect = (choice === correctAnswer);
+
+        buttons.forEach(function(b){ b.classList.remove('chosen', 'correct', 'incorrect', 'reveal-correct'); });
+        btn.classList.add('chosen', isCorrect ? 'correct' : 'incorrect');
+        if(!isCorrect){
+          buttons.forEach(function(b){
+            if(b.getAttribute('data-choice') === correctAnswer) b.classList.add('reveal-correct');
+          });
+        }
+
+        if(panel) panel.classList.add('show');
+        if(verdictEl){
+          verdictEl.textContent = isCorrect ? '✅ Correct!' : '❌ Not quite!';
+          verdictEl.className = 'verdict ' + (isCorrect ? 'correct' : 'incorrect');
+        }
+      });
+    });
+  });
+
+  /* ================= reveal buttons (predict / debug / solution) ================= */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    var originalLabel = btn.textContent;
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-target');
+      var target = document.getElementById(targetId);
+      if(!target) return;
+      var nowShowing = target.classList.toggle('show');
+      btn.textContent = nowShowing ? 'Hide' : originalLabel;
+    });
+  });
+
+  /* ================= hero single-line console ================= */
+  var heroBody = document.getElementById('heroBody');
+  var heroInput = document.getElementById('heroInput');
+  var heroRun = document.getElementById('heroRun');
+
+  function addHeroLine(html, cls){
+    var d = document.createElement('div');
+    d.className = 'line' + (cls ? (' ' + cls) : '');
+    d.innerHTML = html;
+    heroBody.appendChild(d);
+    heroBody.scrollTop = heroBody.scrollHeight;
+  }
+
+  function runHero(){
+    var raw = heroInput.value;
+    var val = raw.trim();
+    if(!val) return;
+    addHeroLine('<span class="prompt">&gt;&gt;&gt;</span> ' + escapeHtml(val));
+
+    var result = runCode(val);
+    if(result.text){
+      result.text.split('\n').forEach(function(line, idx, arr){
+        if(idx === arr.length - 1 && line === '') return;
+        addHeroLine(escapeHtml(line), 'out-ok');
+      });
+    }
+    if(result.error){
+      addHeroLine(escapeHtml(result.error.error), 'out-error');
+      if(result.error.note) addHeroLine(escapeHtml(result.error.note), 'hint');
+    }
+    heroInput.value = '';
+    heroInput.focus();
+  }
+
+  heroRun.addEventListener('click', runHero);
+  heroInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') runHero();
+  });
+
+})();
+</script>
+</body>
+</html>
