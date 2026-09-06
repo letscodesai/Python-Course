@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3 · Variables & Data Types — Python Notes</title>
+<meta name="description" content="Chapter 3 of the Python course: what variables are, the = assignment operator, declaration vs initialization, naming rules and conventions, and the int, float, str and bool data types with type().">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper: #F5F7F1;
+    --paper-dim: #E9EEE3;
+    --ink: #1B2430;
+    --ink-soft: #4B5768;
+    --ink-faint: #7C879A;
+    --amber: #F2B705;
+    --amber-ink: #4A3A00;
+    --amber-soft: rgba(242,183,5,0.16);
+    --teal: #1F958A;
+    --teal-soft: #E4F5F3;
+    --coral: #E75C4B;
+    --coral-soft: #FDE9E6;
+    --card: #FFFFFF;
+    --line: #DDE3D6;
+
+    --display: "Space Grotesk", sans-serif;
+    --body: "Lora", Georgia, serif;
+    --mono: "JetBrains Mono", "Courier New", monospace;
+
+    --maxw: 880px;
+    --radius: 16px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--amber); color: var(--ink); }
+  a{ color: var(--teal); }
+  :focus-visible{ outline: 3px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+
+  h1, h2, h3, h4{
+    font-family: var(--display);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  p{ margin: 0 0 1em 0; }
+  code{ font-family: var(--mono); background: var(--paper-dim); padding: 2px 6px; border-radius: 5px; font-size: 0.9em; }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------------- progress bar ---------------- */
+  .progress-track{ position: fixed; top:0; left:0; right:0; height:4px; background: var(--paper-dim); z-index:100; }
+  .progress-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--teal), var(--amber)); transition: width 0.08s linear; }
+
+  /* ---------------- top bar ---------------- */
+  .topbar{ max-width: var(--maxw); margin: 0 auto; padding: 22px 24px 0 24px; display:flex; align-items:center; justify-content:space-between; font-family: var(--display); }
+  .topbar .brand{ font-weight:700; font-size:15px; letter-spacing:0.02em; display:flex; align-items:center; gap:8px; }
+  .topbar .brand .dot{ width:9px; height:9px; border-radius:50%; background: var(--amber); box-shadow: 0 0 0 4px var(--teal-soft); }
+  .topbar .back-link{ font-size: 13px; font-weight: 600; color: var(--ink-faint); text-decoration:none; }
+  .topbar .back-link:hover{ color: var(--teal); }
+
+  /* ---------------- hero ---------------- */
+  .hero{ max-width: var(--maxw); margin:0 auto; padding: 56px 24px 40px 24px; }
+  .hero .eyebrow{ font-family: var(--mono); font-size:13px; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:14px; }
+  .hero h1{ font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight:700; margin-bottom:18px; }
+  .hero h1 .accent{ color: var(--teal); }
+  .hero .lede{ font-size: 1.15rem; color: var(--ink-soft); max-width: 62ch; margin-bottom: 30px; }
+
+  /* ---------------- shared: dark terminal-style box ---------------- */
+  .darkbox{ background: var(--ink); border-radius: var(--radius); overflow:hidden; box-shadow: 0 18px 40px -18px rgba(27,36,48,0.4); margin: 20px 0; }
+  .darkbox-chrome{ display:flex; align-items:center; gap:8px; padding: 12px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .darkbox-chrome span{ width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .darkbox-chrome span:nth-child(1){ background:#E75C4B; }
+  .darkbox-chrome span:nth-child(2){ background:#F2B705; }
+  .darkbox-chrome span:nth-child(3){ background:#1F958A; }
+  .darkbox-title{ margin-left:8px; font-family: var(--mono); font-size:12px; color: rgba(255,255,255,0.5); }
+
+  .run-btn{ font-family: var(--display); font-weight:600; font-size:13.5px; background: var(--amber); color: var(--amber-ink); border:none; padding:11px 18px; border-radius:8px; cursor:pointer; transition: transform 0.12s ease; white-space: nowrap; }
+  .run-btn:hover{ transform: translateY(-1px); }
+  .run-btn:active{ transform: translateY(0); }
+  .run-btn.check-btn{ background: var(--teal); color:#fff; }
+
+  /* ---------------- multi-line playground ---------------- */
+  .playground textarea{
+    width:100%; box-sizing:border-box; display:block;
+    background: rgba(255,255,255,0.03); border:none; resize:vertical;
+    color:#E7ECE4; font-family: var(--mono); font-size:13.5px; line-height:1.7;
+    padding: 16px 18px; min-height: 74px; outline:none;
+  }
+  .playground-actions{ display:flex; align-items:center; gap:10px; padding: 10px 18px; border-top:1px solid rgba(255,255,255,0.08); border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
+  .playground-hint{ font-family: var(--mono); font-size:11.5px; color: rgba(231,236,228,0.45); }
+  .playground-output-label{ padding: 10px 18px 0 18px; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color: rgba(231,236,228,0.4); }
+  .playground-output{
+    padding: 10px 18px 18px 18px; font-family: var(--mono); font-size:13.5px; color:#E7ECE4;
+    white-space: pre-wrap; word-break: break-word; min-height: 40px;
+    tab-size: 4; -moz-tab-size: 4;
+  }
+  .playground-output .placeholder{ color: rgba(231,236,228,0.35); }
+  .playground-output .error-line{ color:#FF9086; display:block; margin-top:8px; font-weight:600; }
+  .playground-output .error-note{ color: rgba(255,144,134,0.75); display:block; font-weight:400; font-size:12px; margin-top:4px; }
+
+  .result-banner{ margin: 0 18px 16px 18px; padding:11px 15px; border-radius:10px; font-family: var(--display); font-weight:600; font-size:13px; }
+  .result-banner.hidden{ display:none; }
+  .result-banner.pass{ background: rgba(31,149,138,0.18); color: #9CE8DC; }
+  .result-banner.fail{ background: rgba(231,92,75,0.18); color: #FFB4A8; }
+
+  /* ---------------- lesson sections ---------------- */
+  .lesson{ padding: 58px 0; border-top: 1px solid var(--line); }
+  .lesson.alt{ background: var(--paper-dim); }
+  .lesson-head{ display:flex; gap:20px; align-items:baseline; margin-bottom:24px; }
+  .lesson-num{ font-family: var(--display); font-weight:700; font-size:15px; color: var(--teal); background: var(--teal-soft); border-radius:999px; width:40px; height:40px; min-width:40px; display:flex; align-items:center; justify-content:center; }
+  .lesson-head h2{ font-size: clamp(1.4rem, 3.2vw, 1.9rem); }
+  .lesson-intro{ color: var(--ink-soft); max-width: 68ch; font-size: 1.03rem; margin-bottom: 22px; }
+
+  .split-2{ display:grid; grid-template-columns: 1fr 1fr; gap:22px; align-items:start; margin: 18px 0; }
+  .split-2 p{ font-size: 0.98rem; }
+
+  .term-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; }
+  .term-grid.quad{ grid-template-columns: repeat(4, 1fr); }
+  .term-grid.compact{ grid-template-columns: repeat(3, 1fr); }
+  .term-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  .term-card h3{ font-size: 1rem; margin-bottom:6px; font-family: var(--mono); }
+  .term-card p{ font-size: 0.9rem; color: var(--ink-soft); margin-bottom:0; }
+  .term-card .ex{ display:block; margin-top:8px; font-family: var(--mono); font-size:11.5px; color: var(--teal); background: var(--teal-soft); padding:4px 8px; border-radius:6px; }
+
+  .callout{ margin-top:20px; background: var(--coral-soft); border:1px solid rgba(231,92,75,0.25); border-radius: var(--radius); padding:16px 20px; display:flex; gap:14px; align-items:flex-start; }
+  .callout .icon{ width:24px; height:24px; min-width:24px; color: var(--coral); margin-top:2px; }
+  .callout p{ margin:0; color: var(--ink); font-size:0.95rem; }
+  .callout strong{ font-family: var(--display); }
+  .callout.teal{ background: var(--teal-soft); border-color: rgba(31,149,138,0.25); }
+  .callout.teal .icon{ color: var(--teal); }
+  .callout.amber{ background: var(--amber-soft); border-color: rgba(242,183,5,0.35); }
+  .callout.amber .icon{ color: var(--amber-ink); }
+
+  .code-compare{ display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin: 18px 0; }
+  .code-card{ background: var(--ink); border-radius: var(--radius); overflow:hidden; }
+  .code-card .code-head{ display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background: rgba(255,255,255,0.04); font-family: var(--display); font-size:12.5px; font-weight:600; color:#E7ECE4; }
+  .code-card pre{ margin:0; padding:14px 14px 16px 14px; font-family: var(--mono); font-size:13px; color:#DCE7DC; overflow-x:auto; line-height:1.6; }
+  .code-card .out{ background: rgba(255,255,255,0.03); border-top:1px solid rgba(255,255,255,0.07); padding: 10px 14px; font-family: var(--mono); font-size:12.5px; color:#B9EAC0; white-space:pre-wrap; }
+  .code-card .out .lab{ color: rgba(231,236,228,0.4); font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:4px; }
+  .code-card.bad .out{ color:#FFB4A8; }
+
+  .predict-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:20px; }
+  .predict-card .q{ font-family: var(--display); font-weight:600; font-size:0.92rem; margin-bottom:10px; color: var(--ink-soft); }
+  .predict-card pre{ background: var(--ink); color:#DCE7DC; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:12.5px; overflow-x:auto; margin:0 0 12px 0; }
+  .reveal-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--teal-soft); color: var(--teal); border:none; padding:9px 18px; border-radius:999px; cursor:pointer; }
+  .reveal-btn:hover{ filter: brightness(0.95); }
+
+  .yesno-row{ display:flex; gap:10px; }
+  .yesno-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--paper-dim); color: var(--ink); border:1px solid var(--line); padding:9px 22px; border-radius:999px; cursor:pointer; transition: all 0.15s ease; }
+  .yesno-btn:hover{ border-color: var(--teal); }
+  .yesno-btn.chosen.correct{ background: var(--teal); color:#fff; border-color: var(--teal); }
+  .yesno-btn.chosen.incorrect{ background: var(--coral); color:#fff; border-color: var(--coral); }
+  .yesno-btn.reveal-correct{ border-color: var(--teal); color: var(--teal); font-weight:700; }
+  .verdict{ font-family: var(--display); font-weight:700; font-size:0.92rem; margin-bottom:10px; }
+  .verdict.correct{ color: var(--teal); }
+  .verdict.incorrect{ color: var(--coral); }
+
+  .answer-panel{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); display:none; }
+  .answer-panel.show{ display:block; }
+  .answer-panel .out-label{ font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .answer-panel pre{ background:#12261F; color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0 0 10px 0; white-space:pre-wrap; }
+  .answer-panel .explain{ font-size:0.9rem; color: var(--ink-soft); margin-bottom:0; }
+
+  .debug-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:22px; margin-top: 18px; }
+  .debug-card .tag{ display:inline-block; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--coral); background: var(--coral-soft); padding:3px 10px; border-radius:6px; margin-bottom:12px; }
+  .fix-panel{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); display:none; }
+  .fix-panel.show{ display:block; }
+  .fix-panel pre{ background:#12261F; color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0 0 10px 0; }
+  .fix-panel .explain{ font-size:0.9rem; color: var(--ink-soft); margin-bottom:0; }
+
+  .compare-table{ width:100%; border-collapse: collapse; margin: 18px 0; border-radius: var(--radius); overflow:hidden; border: 1px solid var(--line); }
+  .compare-table th{ font-family: var(--display); font-size:0.9rem; padding:12px 16px; text-align:left; color:#fff; }
+  .compare-table th.empty-col{ background: var(--ink); }
+  .compare-table th.rule-col{ background: var(--coral); }
+  .compare-table th.conv-col{ background: var(--teal); }
+  .compare-table td{ padding:13px 16px; font-size:0.9rem; color: var(--ink-soft); border-top:1px solid var(--line); background: var(--card); vertical-align: top; }
+  .compare-table td.label{ font-family: var(--display); font-weight:600; color: var(--ink); background: var(--paper-dim); white-space:nowrap; }
+
+  .challenge-split{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap:22px; align-items:start; margin: 18px 0; }
+  .challenge-info h4{ font-size:1rem; margin-bottom:10px; }
+  .challenge-info p{ font-size:0.94rem; color: var(--ink-soft); }
+  .target-box{ margin-top:14px; }
+  .target-box .target-label{ display:block; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .target-box pre{ background: var(--ink); color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0; white-space:pre-wrap; }
+
+  .var-diagram{ padding: 24px 16px; font-family: var(--mono); font-size: 17px; color:#E7ECE4; text-align:center; }
+  .var-labels{ padding: 4px 16px 18px 16px; display:flex; flex-direction:column; gap:6px; }
+  .var-labels span{ font-family:var(--mono); font-size:11px; }
+
+  .namecheck-body{ padding: 18px 20px 20px 20px; }
+  .namecheck-body label{ display:block; font-family: var(--mono); font-size:12px; color: rgba(231,236,228,0.6); margin-bottom:8px; }
+  .namecheck-body input{ width:100%; box-sizing:border-box; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#F5F7F1; font-family: var(--mono); font-size:15px; padding:11px 14px; border-radius:8px; }
+  .namecheck-body input::placeholder{ color: rgba(245,247,241,0.35); }
+  .namecheck-result{ margin-top:14px; font-family: var(--mono); font-size:13.5px; min-height: 22px; }
+  .namecheck-result.ok{ color:#9CE8DC; }
+  .namecheck-result.bad{ color:#FFB4A8; }
+  .namecheck-result.neutral{ color: rgba(231,236,228,0.4); }
+
+  .valid-invalid-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin: 18px 0; }
+  .name-chip{ font-family: var(--mono); font-size:13px; padding:10px 14px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .name-chip.good{ background: var(--teal-soft); color: var(--teal); }
+  .name-chip.bad{ background: var(--coral-soft); color: var(--coral); }
+  .name-chip .reason{ font-family: var(--body); font-size:11.5px; opacity:0.85; text-align:right; }
+
+  footer{ padding: 46px 0 70px 0; text-align:center; }
+  footer .wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  footer .brand{ font-family: var(--display); font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px; }
+  footer .brand .dot{ width:8px; height:8px; border-radius:50%; background: var(--amber); }
+  footer p{ margin:0; color: var(--ink-faint); font-size:13.5px; }
+
+  @media (max-width: 760px){
+    .term-grid, .code-compare, .split-2, .challenge-split, .valid-invalid-grid{ grid-template-columns: 1fr; }
+    .term-grid.quad{ grid-template-columns: repeat(2, 1fr); }
+    .term-grid.compact{ grid-template-columns: repeat(2, 1fr); }
+    body{ font-size:17px; }
+    .lesson{ padding: 46px 0; }
+    .compare-table{ font-size: 0.82rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Python Notes</div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="eyebrow">Chapter 3: Variables &amp; Data Types</div>
+  <h1>Give a value a name,<br>and Python will <span class="accent">remember it.</span></h1>
+  <p class="lede">So far, every value we've printed has vanished the moment it was shown. A variable is how you keep a value around — under a name you choose — so you can use it again, print it later, or change it entirely.</p>
+
+  <div class="playground" id="pgHero">
+    <div class="darkbox" style="margin:0;">
+      <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">try_variables.py</span></div>
+      <textarea class="pg-input" spellcheck="false" rows="3">name = "Alex"
+print(name)</textarea>
+      <div class="playground-actions">
+        <button class="run-btn pg-run" type="button">Run ▶</button>
+        <span class="playground-hint">edit the name and run it again</span>
+      </div>
+      <div class="playground-output-label">Output</div>
+      <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 01 WHAT'S A VARIABLE ============ -->
+<section class="lesson" id="what-is-a-variable">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">01</div><h2>What's a Variable, and Why Bother?</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> a variable is a named container used to store a value, so that value can be referenced, reused, or changed later in a program.</p>
+    <p>Once you create one, you can print it, reuse it in a calculation, or replace its value entirely — all just by using its name.</p>
+
+    <div class="split-2">
+      <div>
+        <p>Think of a variable like a labelled jar. You put something inside — a number, a piece of text — and stick a name on the jar so you (and Python) know what's in it and where to find it.</p>
+        <p>The jar's label doesn't describe the jar itself — it points to whatever is currently inside.</p>
+      </div>
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">first_variable.py</span></div>
+        <div class="var-diagram">
+          <span style="color:#7FD9CF; font-weight:600;">name</span> <span style="color:#DCE7DC;">=</span> <span style="color:#F2C879;">"Alex"</span>
+        </div>
+        <div class="var-labels">
+          <span style="color:#7FD9CF;">■ name — the label you chose</span>
+          <span style="color:#DCE7DC;">■ = — "store this value under this label"</span>
+          <span style="color:#F2C879;">■ "Alex" — the value being stored</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="playground" id="pgVarBasics">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">two_variables.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="4">name = "Alex"
+age = 12
+print("Name:", name, "Age:", age)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">two variables, printed together — just like Chapter 2's print()</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 ASSIGNMENT ============ -->
+<section class="lesson alt" id="assignment">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">02</div><h2>The = Sign: Assignment, Not Equality</h2></div>
+    <p class="lesson-intro">In maths, <code>=</code> means "these two things are equal." In Python, it means something different.</p>
+    <p><strong>Definition:</strong> assignment means storing the value on the right under the name on the left. It's an instruction, not a claim.</p>
+
+    <div class="predict-card yesno-card" data-answer="no">
+      <div class="q">Does <code>=</code> check whether two things are equal in Python?</div>
+      <pre>age = 12</pre>
+      <div class="yesno-row">
+        <button class="yesno-btn" data-choice="yes">Yes</button>
+        <button class="yesno-btn" data-choice="no">No</button>
+      </div>
+      <div class="answer-panel" id="ansEq">
+        <div class="verdict"></div>
+        <p class="explain"><code>age = 12</code> doesn't ask "is age equal to 12?" — it commands "store 12 under the name age." Python checks equality with a different symbol, <code>==</code>, which we'll meet properly once we cover conditions.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:22px; font-size:0.98rem;">A variable's value isn't locked in forever — assigning a new value to the same name simply replaces what was there.</p>
+
+    <div class="playground" id="pgReassign">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">reassign.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="4">age = 12
+print(age)
+age = 13
+print(age)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">same name, two different values over time</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+
+    <p style="font-size:0.98rem;">Variables aren't just for printing directly — you can use them inside a calculation too, and Python uses their current value.</p>
+
+    <div class="code-card" style="max-width:360px;">
+      <div class="code-head"><span>use_in_calc.py</span></div>
+      <pre>score = <span style="color:#F2C879;">10</span>
+print(score + <span style="color:#F2C879;">5</span>)</pre>
+      <div class="out"><span class="lab">Output</span>15</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 DECLARATION VS INITIALIZATION ============ -->
+<section class="lesson" id="declaration-init">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">03</div><h2>Declaration vs Initialization, Python-Style</h2></div>
+    <p class="lesson-intro"><strong>Declaration:</strong> telling a program that a name is going to exist.</p>
+    <p class="lesson-intro"><strong>Initialization:</strong> giving that name its first value.</p>
+    <p>In some languages, these are two separate steps. In Python, they happen at the same moment: the instant you assign a value to a name, that name springs into existence, already holding that value.</p>
+
+    <div class="callout">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+      <p><strong>So what happens if you use a name before assigning it anything?</strong> Python has no idea what you're talking about, and raises a <strong>NameError</strong> — Python's way of saying "I don't recognise this name," because in Python a name doesn't exist at all until an assignment creates it. Try running the broken code below.</p>
+    </div>
+
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Fix the order</h4>
+        <p>This code tries to print <code>age</code> before it's ever been assigned. Reorder or edit the lines so it runs cleanly and prints:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>13</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgDeclareInit" style="margin:0;" data-expected="13">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">order_matters.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="3">print(age)
+age = 13</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+
+    <div class="callout teal">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p><strong>Remember Chapter 1?</strong> Python runs your code one line at a time, in order. That's exactly why this fails — line 1 tries to use <code>age</code> before line 2 has had the chance to create it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 NAMING RULES ============ -->
+<section class="lesson alt" id="naming-rules">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">04</div><h2>Naming Rules: What Python Will Allow</h2></div>
+    <p class="lesson-intro">Python enforces a strict set of rules for what a variable name is allowed to look like. Break one, and Python won't create the variable at all — it'll refuse to run.</p>
+
+    <ul style="font-size:0.98rem; color:var(--ink-soft); padding-left:20px; margin-bottom:22px;">
+      <li>Must start with a letter or an underscore <code>_</code></li>
+      <li>Can contain letters, numbers, and underscores after that first character</li>
+      <li>Cannot contain spaces</li>
+      <li>Cannot contain symbols like <code>-</code>, <code>@</code>, <code>!</code></li>
+      <li>Cannot start with a number</li>
+      <li>Is case-sensitive — <code>age</code>, <code>Age</code>, and <code>AGE</code> are three different names</li>
+      <li>Cannot be one of Python's reserved keywords — words like <code>if</code>, <code>for</code>, <code>while</code>, <code>class</code>, <code>def</code></li>
+    </ul>
+
+    <div class="darkbox" id="namecheckWidget">
+      <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">name_checker.py</span></div>
+      <div class="namecheck-body">
+        <label for="nameCheckInput">Type a possible variable name and see instantly whether Python would allow it:</label>
+        <input type="text" id="nameCheckInput" placeholder="e.g. student_name" autocomplete="off" spellcheck="false">
+        <div class="namecheck-result neutral" id="nameCheckResult">Start typing to check…</div>
+      </div>
+    </div>
+
+    <div class="valid-invalid-grid">
+      <div class="name-chip good">student_name <span class="reason">✅ valid</span></div>
+      <div class="name-chip bad">2cool <span class="reason">❌ starts with a number</span></div>
+      <div class="name-chip good">_hidden <span class="reason">✅ valid</span></div>
+      <div class="name-chip bad">my-var <span class="reason">❌ contains a hyphen</span></div>
+      <div class="name-chip good">total2 <span class="reason">✅ valid</span></div>
+      <div class="name-chip bad">for <span class="reason">❌ reserved keyword</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 NAMING CONVENTIONS ============ -->
+<section class="lesson" id="naming-conventions">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">05</div><h2>Naming Conventions: Rules vs Recommendations</h2></div>
+    <p class="lesson-intro"><strong>Rule:</strong> enforced by Python — break it, and your code won't run.<br><strong>Convention:</strong> a widely agreed-on good habit — break it, and your code still runs fine, but it's harder for humans to read.</p>
+
+    <table class="compare-table">
+      <thead><tr><th class="empty-col"></th><th class="rule-col">Rule</th><th class="conv-col">Convention</th></tr></thead>
+      <tbody>
+        <tr><td class="label">Enforced by</td><td>Python itself</td><td>Good habit, agreed by programmers</td></tr>
+        <tr><td class="label">Break it and…</td><td>your code won't run at all</td><td>your code runs, just harder to read</td></tr>
+        <tr><td class="label">Example</td><td>can't start with a number</td><td>use <code>snake_case</code>, not <code>CamelCase</code></td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:0.98rem;">The most common Python conventions: use lowercase words, separate them with underscores (called <strong>snake_case</strong> — writing multi-word names in lowercase with underscores between the words, like <code>total_marks</code>), and pick names descriptive enough that someone else could guess what they hold.</p>
+
+    <div class="code-compare">
+      <div class="code-card bad">
+        <div class="code-head"><span>unclear.py</span></div>
+        <pre>x = <span style="color:#F2C879;">95</span>
+y = <span style="color:#7FD9CF;">"blue"</span></pre>
+        <div class="out"><span class="lab">Problem</span>Works fine — but what do x and y mean?</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>descriptive.py</span></div>
+        <pre>total_marks = <span style="color:#F2C879;">95</span>
+favourite_colour = <span style="color:#7FD9CF;">"blue"</span></pre>
+        <div class="out"><span class="lab">Better</span>Same values, obvious meaning</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 MEET THE DATA TYPES ============ -->
+<section class="lesson alt" id="meet-types">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">06</div><h2>Meet the Data Types</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> a data type is a category that describes what kind of value something is, and what Python can do with it. Here are the four you'll use constantly, at a glance — each gets its own closer look next.</p>
+
+    <div class="term-grid quad">
+      <div class="term-card"><h3>int</h3><p>Whole numbers, no decimal point.</p><span class="ex">age = 13</span></div>
+      <div class="term-card"><h3>float</h3><p>Numbers with a decimal point.</p><span class="ex">height = 1.55</span></div>
+      <div class="term-card"><h3>str</h3><p>Text, wrapped in quotes.</p><span class="ex">name = "Alex"</span></div>
+      <div class="term-card"><h3>bool</h3><p>Only two possible values.</p><span class="ex">is_student = True</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 INT ============ -->
+<section class="lesson" id="int-type">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">07</div><h2>Whole Numbers: int</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> an <code>int</code> (short for <em>integer</em>) is any whole number — positive, negative, or zero — with no decimal point at all.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>positive.py</span></div>
+        <pre>students = <span style="color:#F2C879;">30</span></pre>
+        <div class="out"><span class="lab">A whole class of students</span>int</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>negative.py</span></div>
+        <pre>temperature = <span style="color:#F2C879;">-5</span></pre>
+        <div class="out"><span class="lab">Below freezing</span>int</div>
+      </div>
+    </div>
+
+    <div class="predict-card yesno-card" data-answer="no" style="margin-bottom:20px;">
+      <div class="q">Does Python's int have a fixed maximum size, the way it does in some other languages?</div>
+      <div class="yesno-row">
+        <button class="yesno-btn" data-choice="yes">Yes</button>
+        <button class="yesno-btn" data-choice="no">No</button>
+      </div>
+      <div class="answer-panel" id="ansIntSize">
+        <div class="verdict"></div>
+        <p class="explain">Python integers can grow as large as your computer's memory allows. Other languages often set aside a fixed number of <strong>bits</strong> — the 0-or-1 switches you met back in Chapter 1 — for every whole number, which puts a hard ceiling on how big it can get (commonly 32 or 64 of those switches). Python doesn't do that: it simply uses as many bits as your number actually needs, so there's no fixed ceiling to hit. Try it below.</p>
+      </div>
+    </div>
+
+    <div class="playground" id="pgBigInt">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">huge_number.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="2">print(99999999999999999999999999999)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">30 digits, printed exactly — no rounding, no overflow</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 FLOAT ============ -->
+<section class="lesson alt" id="float-type">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">08</div><h2>Decimal Numbers: float</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> a <code>float</code> is any number written with a decimal point — <code>1.55</code>, <code>-3.2</code>, even <code>5.0</code>. The decimal point is what makes it a float instead of an int, even if the value is a whole number.</p>
+
+    <div class="predict-card">
+      <div class="q">Predict the output</div>
+      <pre>print(0.1 + 0.2)</pre>
+      <button class="reveal-btn" data-target="ansFloat">Reveal output</button>
+      <div class="answer-panel" id="ansFloat">
+        <div class="out-label">Output</div>
+        <pre>0.30000000000000004</pre>
+        <p class="explain">Not a bug — a float always uses a fixed set of 64 <strong>bits</strong> (the same 0-or-1 switches from Chapter 1) to store each decimal number. That's extremely precise, but with only a fixed number of switches to work with, some decimal fractions can't be stored perfectly exactly — much like how ⅓ can't be written exactly as a decimal either. That's what produces tiny leftovers like this.</p>
+      </div>
+    </div>
+
+    <div class="challenge-split" style="margin-top:22px;">
+      <div class="challenge-info">
+        <h4>🎯 Your turn</h4>
+        <p>Store a price as a float and print it so the output reads exactly:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>19.99</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgFloatChallenge" style="margin:0;" data-expected="19.99">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">price.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="2">price = 0
+print(price)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 STR ============ -->
+<section class="lesson" id="str-type">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">09</div><h2>Text: str</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> a <code>str</code> (short for <em>string</em>) is text — any characters wrapped in quotes, single or double. From Chapter 2, you already know both work the same way.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>double.py</span></div>
+        <pre>greeting = <span style="color:#7FD9CF;">"Hello"</span></pre>
+        <div class="out"><span class="lab">Type</span>str</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>single.py</span></div>
+        <pre>greeting = <span style="color:#7FD9CF;">'Hello'</span></pre>
+        <div class="out"><span class="lab">Type</span>str</div>
+      </div>
+    </div>
+
+    <div class="predict-card yesno-card" data-answer="no">
+      <div class="q">Is <code>"25"</code> the same kind of value as <code>25</code>?</div>
+      <pre>code = "25"
+number = 25</pre>
+      <div class="yesno-row">
+        <button class="yesno-btn" data-choice="yes">Yes</button>
+        <button class="yesno-btn" data-choice="no">No</button>
+      </div>
+      <div class="answer-panel" id="ansStrNum">
+        <div class="verdict"></div>
+        <p class="explain">They can look identical on screen, but <code>"25"</code> is text (str) and <code>25</code> is a number (int) — two completely different data types, as you're about to prove with <code>type()</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10 BOOL ============ -->
+<section class="lesson alt" id="bool-type">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">10</div><h2>True/False: bool</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> a <code>bool</code> (short for <em>boolean</em>) can only ever hold one of two values: <code>True</code> or <code>False</code>. Notice the capital letter — that's not optional in Python.</p>
+
+    <div class="code-card" style="max-width:360px;">
+      <div class="code-head"><span>bool_example.py</span></div>
+      <pre>is_student = <span style="color:#F2C879;">True</span>
+is_raining = <span style="color:#F2C879;">False</span></pre>
+      <div class="out"><span class="lab">Type of both</span>bool</div>
+    </div>
+
+    <div class="debug-card">
+      <span class="tag">Debug this</span>
+      <p style="font-size:0.92rem; color:var(--ink-soft);">This is a very common beginner slip. Fix the code so it runs and prints exactly:</p>
+      <div class="target-box"><span class="target-label">Target output</span><pre>True</pre></div>
+
+      <div class="playground darkbox" id="pgBoolDebug" style="margin:14px 0 0 0;" data-expected="True">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">is_ready.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="2">is_ready = true
+print(is_ready)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+
+      <button class="reveal-btn" data-target="fixBool" style="margin-top:14px;">Show the fix</button>
+      <div class="fix-panel" id="fixBool">
+        <pre>is_ready = True
+print(is_ready)</pre>
+        <p class="explain">Lowercase <code>true</code> isn't a Python keyword — Python treats it as an unrecognised name, giving a <code>NameError</code>. Capitalizing it to <code>True</code> makes it the actual boolean value.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 TYPE() ============ -->
+<section class="lesson" id="type-function">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">11</div><h2>type(): Asking Python "What Is This?"</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> <code>type()</code> is a built-in Python tool that reports the data type of whatever value or variable you give it. Not sure what data type something is? Wrap it in <code>type()</code> and print the result — Python will tell you directly.</p>
+
+    <div class="playground" id="pgTypeExplorer">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">type_detective.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="6">print(type(25))
+print(type(25.5))
+print(type("25"))
+print(type(True))
+
+age = 13
+print(type(age))</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">try wrapping your own values in type()</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v5M12 15.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p><strong>Three things, one question:</strong> a <em>value</em> (like <code>13</code>) has a <em>data type</em> (int). A <em>variable</em> (like <code>age</code>) doesn't have its own separate type — <code>type(age)</code> simply reports the type of whatever value <code>age</code> currently holds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12 ONE VARIABLE, MANY TYPES ============ -->
+<section class="lesson alt" id="variable-and-types">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">12</div><h2>One Variable, Many Types Over Time</h2></div>
+    <p class="lesson-intro">A variable name doesn't belong permanently to one data type. Its type is decided entirely by whatever value it currently holds — and reassigning it can change that type completely.</p>
+
+    <div class="code-card" style="max-width:300px;">
+      <div class="code-head"><span>type_switch.py</span></div>
+      <pre>value = <span style="color:#F2C879;">10</span>
+value = <span style="color:#7FD9CF;">"Hello"</span></pre>
+      <div class="out"><span class="lab">What changed</span>value went from int to str — same name, new type</div>
+    </div>
+
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Prove it with type()</h4>
+        <p>Add <code>type()</code> checks before and after the reassignment so the output reads exactly:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>&lt;class 'int'&gt;
+&lt;class 'str'&gt;</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgTypeSwitch" style="margin:0;" data-expected="&lt;class 'int'&gt;&#10;&lt;class 'str'&gt;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">prove_it.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="4">value = 10
+
+value = "Hello"</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13 RECAP ============ -->
+<section class="lesson" id="recap">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">13</div><h2>Chapter Recap</h2></div>
+    <p class="lesson-intro">A quick-glance reference for revising later.</p>
+
+    <div class="term-grid compact">
+      <div class="term-card"><h3>Variable</h3><p>A name given to a value, so it can be reused or changed later.</p></div>
+      <div class="term-card"><h3>=</h3><p>Assignment — "store this value under this name." Not equality.</p></div>
+      <div class="term-card"><h3>Declaration + Initialization</h3><p>Python does both in one step: assignment.</p></div>
+      <div class="term-card"><h3>NameError</h3><p>Happens when a name is used before it's ever assigned.</p></div>
+      <div class="term-card"><h3>Naming rule</h3><p>Enforced by Python — break it and the code won't run.</p></div>
+      <div class="term-card"><h3>Naming convention</h3><p>A good habit, like snake_case — not enforced, just recommended.</p></div>
+      <div class="term-card"><h3>int</h3><p>A whole number, any size, no decimal point.</p></div>
+      <div class="term-card"><h3>float</h3><p>A number with a decimal point — has limited precision.</p></div>
+      <div class="term-card"><h3>str</h3><p>Text, wrapped in single or double quotes.</p></div>
+      <div class="term-card"><h3>bool</h3><p>Only True or False, always capitalized.</p></div>
+      <div class="term-card"><h3>type()</h3><p>Reports the data type of a value or variable.</p></div>
+      <div class="term-card"><h3>Reassignment</h3><p>Can change both a variable's value and its data type.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> Python Notes — Chapter 3</div>
+    <p>Variables &amp; Data Types</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= scroll progress ================= */
+  var fill = document.getElementById('progressFill');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop || document.body.scrollTop;
+    var height = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+    var pct = height > 0 ? (scrolled / height) * 100 : 0;
+    fill.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  /* ================= mini Python interpreter =================
+     Supports: variable assignment, print() with sep/end, string
+     literals with escapes, int (arbitrary precision via BigInt),
+     float (64-bit, matching Python's repr quirks), bool (True/False),
+     type(), simple numeric expressions (a + b, a - b, etc.), and
+     realistic NameError / SyntaxError simulation. */
+
+  var PY_KEYWORDS = ['False','None','True','and','as','assert','async','await','break','class',
+    'continue','def','del','elif','else','except','finally','for','from','global','if','import',
+    'in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield'];
+
+  function validateIdentifier(name){
+    if(name === '') return { valid:false, reason:"Variable names can't be empty." };
+    if(/\s/.test(name)) return { valid:false, reason:"Variable names can't contain spaces." };
+    if(/^[0-9]/.test(name)) return { valid:false, reason:"Variable names can't start with a number." };
+    if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)){
+      return { valid:false, reason:"Variable names can only contain letters, numbers, and underscores." };
+    }
+    if(PY_KEYWORDS.indexOf(name) !== -1){
+      return { valid:false, reason:"'" + name + "' is a reserved Python keyword and can't be used as a name." };
+    }
+    return { valid:true };
+  }
+
+  function processEscapes(s){
+    var out = '';
+    for(var i = 0; i < s.length; i++){
+      var c = s[i];
+      if(c === '\\' && i + 1 < s.length){
+        var next = s[i+1];
+        if(next === 'n'){ out += '\n'; i++; }
+        else if(next === 't'){ out += '\t'; i++; }
+        else if(next === '\\'){ out += '\\'; i++; }
+        else if(next === '"'){ out += '"'; i++; }
+        else if(next === "'"){ out += "'"; i++; }
+        else { out += c; }
+      } else { out += c; }
+    }
+    return out;
+  }
+
+  function parseStringLiteral(token){
+    if(token.length < 1) return null;
+    var quoteChar = token[0];
+    if(quoteChar !== '"' && quoteChar !== "'") return null;
+    var i = 1, content = '', closed = false;
+    for(; i < token.length; i++){
+      var ch = token[i];
+      if(ch === '\\' && i + 1 < token.length){ content += ch + token[i+1]; i++; continue; }
+      if(ch === quoteChar){ closed = true; i++; break; }
+      content += ch;
+    }
+    if(!closed) return null;
+    return { raw: content, rest: token.slice(i) };
+  }
+
+  function splitTopLevel(str){
+    var tokens = [], current = '', inQuote = null, escaped = false;
+    for(var i = 0; i < str.length; i++){
+      var ch = str[i];
+      if(inQuote){
+        current += ch;
+        if(escaped){ escaped = false; }
+        else if(ch === '\\'){ escaped = true; }
+        else if(ch === inQuote){ inQuote = null; }
+      } else {
+        if(ch === '"' || ch === "'"){ inQuote = ch; current += ch; }
+        else if(ch === ','){ tokens.push(current); current = ''; }
+        else { current += ch; }
+      }
+    }
+    if(inQuote) return { error: true };
+    tokens.push(current);
+    return { error: false, tokens: tokens };
+  }
+
+  function formatPyFloat(n){
+    var s = String(n);
+    if(s.indexOf('.') === -1 && s.indexOf('e') === -1 && s.indexOf('E') === -1){
+      s += '.0';
+    }
+    return s;
+  }
+
+  function displayValue(v){
+    if(v.pytype === 'str') return v.value;
+    if(v.pytype === 'int') return v.value.toString();
+    if(v.pytype === 'float') return formatPyFloat(v.value);
+    if(v.pytype === 'bool') return v.value ? 'True' : 'False';
+    if(v.pytype === 'type') return v.value;
+    return String(v.value);
+  }
+
+  function evaluateToken(token, variables, lineNo){
+    token = token.trim();
+
+    if(token === 'True') return { ok:true, pytype:'bool', value:true };
+    if(token === 'False') return { ok:true, pytype:'bool', value:false };
+
+    var typeMatch = token.match(/^type\s*\(([\s\S]*)\)$/);
+    if(typeMatch){
+      var innerRes = evaluateToken(typeMatch[1], variables, lineNo);
+      if(!innerRes.ok) return innerRes;
+      if(innerRes.pytype === 'type'){
+        return { ok:false, error:"TypeError: unsupported nested type() call", note:"Line " + lineNo };
+      }
+      return { ok:true, pytype:'type', value:"<class '" + innerRes.pytype + "'>" };
+    }
+
+    if(token[0] === '"' || token[0] === "'"){
+      var strParsed = parseStringLiteral(token);
+      if(strParsed === null) return { ok:false, error:"SyntaxError: unterminated string literal", note:"Line " + lineNo };
+      if(strParsed.rest.trim() !== '') return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+      return { ok:true, pytype:'str', value: processEscapes(strParsed.raw) };
+    }
+
+    var binMatch = token.match(/^(\S+)\s+([+\-*/])\s+(\S+)$/);
+    if(binMatch){
+      var leftRes = evaluateToken(binMatch[1], variables, lineNo);
+      if(!leftRes.ok) return leftRes;
+      var rightRes = evaluateToken(binMatch[3], variables, lineNo);
+      if(!rightRes.ok) return rightRes;
+      var op = binMatch[2];
+      var leftIsNum = (leftRes.pytype === 'int' || leftRes.pytype === 'float');
+      var rightIsNum = (rightRes.pytype === 'int' || rightRes.pytype === 'float');
+      if(!leftIsNum || !rightIsNum){
+        return { ok:false, error:"TypeError: unsupported operand type(s) for " + op, note:"Line " + lineNo };
+      }
+      if(leftRes.pytype === 'int' && rightRes.pytype === 'int' && op !== '/'){
+        var a = leftRes.value, b = rightRes.value, r;
+        if(op === '+') r = a + b;
+        else if(op === '-') r = a - b;
+        else if(op === '*') r = a * b;
+        return { ok:true, pytype:'int', value:r };
+      } else {
+        var af = (leftRes.pytype === 'int') ? Number(leftRes.value) : leftRes.value;
+        var bf = (rightRes.pytype === 'int') ? Number(rightRes.value) : rightRes.value;
+        var rf;
+        if(op === '+') rf = af + bf;
+        else if(op === '-') rf = af - bf;
+        else if(op === '*') rf = af * bf;
+        else if(op === '/') rf = af / bf;
+        return { ok:true, pytype:'float', value:rf };
+      }
+    }
+
+    if(/^-?\d+\.\d+$/.test(token)) return { ok:true, pytype:'float', value: parseFloat(token) };
+    if(/^-?\d+$/.test(token)) return { ok:true, pytype:'int', value: BigInt(token) };
+
+    if(/^[A-Za-z_]\w*$/.test(token)){
+      if(PY_KEYWORDS.indexOf(token) !== -1){
+        return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo + " — '" + token + "' is a reserved keyword." };
+      }
+      if(Object.prototype.hasOwnProperty.call(variables, token)){
+        return { ok:true, pytype: variables[token].pytype, value: variables[token].value };
+      }
+      return { ok:false, error:"NameError: name '" + token + "' is not defined", note:"Line " + lineNo };
+    }
+
+    return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+  }
+
+  function parsePrintPiece(token, variables, lineNo, sepEndState){
+    var kwMatch = token.trim().match(/^(sep|end)\s*=\s*([\s\S]*)$/);
+    if(kwMatch){
+      var kwParsed = parseStringLiteral(kwMatch[2].trim());
+      if(kwParsed === null || kwParsed.rest.trim() !== ''){
+        return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+      }
+      var kwVal = processEscapes(kwParsed.raw);
+      if(kwMatch[1] === 'sep') sepEndState.sep = kwVal; else sepEndState.end = kwVal;
+      return { ok:true, isKw:true };
+    }
+    var res = evaluateToken(token, variables, lineNo);
+    if(!res.ok) return res;
+    return { ok:true, isKw:false, display: displayValue(res) };
+  }
+
+  function parseLine(rawLine, lineNo, variables){
+    var trimmed = rawLine.trim();
+    if(trimmed === '' || trimmed.indexOf('#') === 0) return { ok:true, output:null };
+
+    var assignMatch = trimmed.match(/^([A-Za-z_]\w*)\s*=\s*([\s\S]+)$/);
+    if(assignMatch){
+      var varName = assignMatch[1];
+      if(PY_KEYWORDS.indexOf(varName) !== -1){
+        return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo + " — '" + varName + "' is a reserved keyword and can't be used as a variable name." };
+      }
+      var rhsRes = evaluateToken(assignMatch[2], variables, lineNo);
+      if(!rhsRes.ok) return rhsRes;
+      variables[varName] = { pytype: rhsRes.pytype, value: rhsRes.value };
+      return { ok:true, output:null };
+    }
+
+    if(!/^[A-Za-z_]\w*\s*\(/.test(trimmed) && /^[^=]+=[^=].*$/.test(trimmed)){
+      var brokenMatch = trimmed.match(/^([^=]+?)\s*=\s*([\s\S]+)$/);
+      var candidate = brokenMatch[1].trim();
+      var validation = validateIdentifier(candidate);
+      if(!validation.valid){
+        return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo + " — " + validation.reason };
+      }
+    }
+
+    var callMatch = trimmed.match(/^([A-Za-z_]\w*)\s*\(([\s\S]*)\)\s*;?\s*$/);
+    if(!callMatch){
+      if(/^[A-Za-z_]\w*$/.test(trimmed)){
+        if(Object.prototype.hasOwnProperty.call(variables, trimmed)) return { ok:true, output:null };
+        return { ok:false, error:"NameError: name '" + trimmed + "' is not defined", note:"Line " + lineNo };
+      }
+      return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+    }
+    var funcName = callMatch[1];
+    if(funcName !== 'print'){
+      return { ok:false, error:"NameError: name '" + funcName + "' is not defined", note:"Line " + lineNo };
+    }
+    var split = splitTopLevel(callMatch[2]);
+    if(split.error) return { ok:false, error:"SyntaxError: unterminated string literal", note:"Line " + lineNo };
+
+    var pieces = [];
+    var sepEndState = { sep:' ', end:'\n' };
+    for(var i = 0; i < split.tokens.length; i++){
+      var tk = split.tokens[i].trim();
+      if(tk === '') continue;
+      var pieceRes = parsePrintPiece(tk, variables, lineNo, sepEndState);
+      if(!pieceRes.ok) return pieceRes;
+      if(!pieceRes.isKw) pieces.push(pieceRes.display);
+    }
+    return { ok:true, output: pieces.join(sepEndState.sep) + sepEndState.end };
+  }
+
+  function runCode(codeText){
+    var lines = codeText.split('\n');
+    var variables = {};
+    var resultText = '';
+    var errorInfo = null;
+    for(var i = 0; i < lines.length; i++){
+      var res;
+      try{ res = parseLine(lines[i], i + 1, variables); }
+      catch(e){ res = { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + (i+1) }; }
+      if(!res.ok){ errorInfo = res; break; }
+      if(res.output !== null && res.output !== undefined) resultText += res.output;
+    }
+    return { text: resultText, error: errorInfo };
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderOutput(outputEl, result){
+    var html = '';
+    if(result.text){ html += escapeHtml(result.text); }
+    if(result.error){
+      html += '<span class="error-line">' + escapeHtml(result.error.error) + '</span>';
+      if(result.error.note){ html += '<span class="error-note">' + escapeHtml(result.error.note) + '</span>'; }
+    }
+    outputEl.innerHTML = html || '<span class="placeholder">(no output)</span>';
+  }
+
+  /* ================= wire up every playground's Run button ================= */
+  document.querySelectorAll('.playground').forEach(function(pg){
+    var textarea = pg.querySelector('.pg-input');
+    var runBtn = pg.querySelector('.pg-run');
+    var output = pg.querySelector('.pg-output');
+    if(!textarea || !runBtn || !output) return;
+    runBtn.addEventListener('click', function(){
+      renderOutput(output, runCode(textarea.value));
+    });
+  });
+
+  /* ================= exact-match Check buttons ================= */
+  document.querySelectorAll('.pg-check').forEach(function(btn){
+    var pg = btn.closest('.playground');
+    if(!pg) return;
+    var textarea = pg.querySelector('.pg-input');
+    var output = pg.querySelector('.pg-output');
+    var banner = pg.querySelector('.result-banner');
+    var expected = pg.getAttribute('data-expected') || '';
+
+    btn.addEventListener('click', function(){
+      var result = runCode(textarea.value);
+      renderOutput(output, result);
+      if(!banner) return;
+      banner.classList.remove('hidden', 'pass', 'fail');
+      if(result.error){
+        banner.classList.add('fail');
+        banner.textContent = '❌ There\'s an error above — fix it and check again.';
+        return;
+      }
+      var actual = (result.text || '').replace(/\n+$/, '');
+      var exp = expected.replace(/\n+$/, '');
+      if(actual === exp){
+        banner.classList.add('pass');
+        banner.textContent = '✅ Matches the target output — nicely done!';
+      } else {
+        banner.classList.add('fail');
+        banner.textContent = '❌ Not quite yet — compare your output above with the target.';
+      }
+    });
+  });
+
+  /* ================= reveal buttons (predict / debug / solution) ================= */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    var originalLabel = btn.textContent;
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-target');
+      var target = document.getElementById(targetId);
+      if(!target) return;
+      var nowShowing = target.classList.toggle('show');
+      btn.textContent = nowShowing ? 'Hide' : originalLabel;
+    });
+  });
+
+  /* ================= yes/no question cards ================= */
+  document.querySelectorAll('.yesno-card').forEach(function(card){
+    var correctAnswer = card.getAttribute('data-answer');
+    var buttons = card.querySelectorAll('.yesno-btn');
+    var panel = card.querySelector('.answer-panel');
+    var verdictEl = panel ? panel.querySelector('.verdict') : null;
+
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var choice = btn.getAttribute('data-choice');
+        var isCorrect = (choice === correctAnswer);
+
+        buttons.forEach(function(b){ b.classList.remove('chosen', 'correct', 'incorrect', 'reveal-correct'); });
+        btn.classList.add('chosen', isCorrect ? 'correct' : 'incorrect');
+        if(!isCorrect){
+          buttons.forEach(function(b){
+            if(b.getAttribute('data-choice') === correctAnswer) b.classList.add('reveal-correct');
+          });
+        }
+
+        if(panel) panel.classList.add('show');
+        if(verdictEl){
+          verdictEl.textContent = isCorrect ? '✅ Correct!' : '❌ Not quite!';
+          verdictEl.className = 'verdict ' + (isCorrect ? 'correct' : 'incorrect');
+        }
+      });
+    });
+  });
+
+  /* ================= live naming-rules checker ================= */
+  var nameCheckInput = document.getElementById('nameCheckInput');
+  var nameCheckResult = document.getElementById('nameCheckResult');
+  if(nameCheckInput && nameCheckResult){
+    nameCheckInput.addEventListener('input', function(){
+      var val = nameCheckInput.value;
+      if(val === ''){
+        nameCheckResult.className = 'namecheck-result neutral';
+        nameCheckResult.textContent = 'Start typing to check…';
+        return;
+      }
+      var result = validateIdentifier(val);
+      if(result.valid){
+        nameCheckResult.className = 'namecheck-result ok';
+        nameCheckResult.textContent = '✅ "' + val + '" is a valid variable name.';
+      } else {
+        nameCheckResult.className = 'namecheck-result bad';
+        nameCheckResult.textContent = '❌ ' + result.reason;
+      }
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
