@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 · Input, Type Conversion &amp; Math Operators — Python Notes</title>
+<meta name="description" content="Chapter 4 of the Python course: getting input() from users, why input() always returns a string, converting with int(), float() and str(), and Python's math operators including /, //, %, ** and the order of operations.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Lora:ital,wght@0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper: #F5F7F1;
+    --paper-dim: #E9EEE3;
+    --ink: #1B2430;
+    --ink-soft: #4B5768;
+    --ink-faint: #7C879A;
+    --amber: #F2B705;
+    --amber-ink: #4A3A00;
+    --amber-soft: rgba(242,183,5,0.16);
+    --teal: #1F958A;
+    --teal-soft: #E4F5F3;
+    --coral: #E75C4B;
+    --coral-soft: #FDE9E6;
+    --card: #FFFFFF;
+    --line: #DDE3D6;
+
+    --display: "Space Grotesk", sans-serif;
+    --body: "Lora", Georgia, serif;
+    --mono: "JetBrains Mono", "Courier New", monospace;
+
+    --maxw: 880px;
+    --radius: 16px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--amber); color: var(--ink); }
+  a{ color: var(--teal); }
+  :focus-visible{ outline: 3px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+
+  h1, h2, h3, h4{
+    font-family: var(--display);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  p{ margin: 0 0 1em 0; }
+  code{ font-family: var(--mono); background: var(--paper-dim); padding: 2px 6px; border-radius: 5px; font-size: 0.9em; }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .progress-track{ position: fixed; top:0; left:0; right:0; height:4px; background: var(--paper-dim); z-index:100; }
+  .progress-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--teal), var(--amber)); transition: width 0.08s linear; }
+
+  .topbar{ max-width: var(--maxw); margin: 0 auto; padding: 22px 24px 0 24px; display:flex; align-items:center; justify-content:space-between; font-family: var(--display); }
+  .topbar .brand{ font-weight:700; font-size:15px; letter-spacing:0.02em; display:flex; align-items:center; gap:8px; }
+  .topbar .brand .dot{ width:9px; height:9px; border-radius:50%; background: var(--amber); box-shadow: 0 0 0 4px var(--teal-soft); }
+
+  .hero{ max-width: var(--maxw); margin:0 auto; padding: 56px 24px 40px 24px; }
+  .hero .eyebrow{ font-family: var(--mono); font-size:13px; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:14px; }
+  .hero h1{ font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight:700; margin-bottom:18px; }
+  .hero h1 .accent{ color: var(--teal); }
+  .hero .lede{ font-size: 1.15rem; color: var(--ink-soft); max-width: 62ch; margin-bottom: 30px; }
+
+  .darkbox{ background: var(--ink); border-radius: var(--radius); overflow:hidden; box-shadow: 0 18px 40px -18px rgba(27,36,48,0.4); margin: 20px 0; }
+  .darkbox-chrome{ display:flex; align-items:center; gap:8px; padding: 12px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .darkbox-chrome span{ width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .darkbox-chrome span:nth-child(1){ background:#E75C4B; }
+  .darkbox-chrome span:nth-child(2){ background:#F2B705; }
+  .darkbox-chrome span:nth-child(3){ background:#1F958A; }
+  .darkbox-title{ margin-left:8px; font-family: var(--mono); font-size:12px; color: rgba(255,255,255,0.5); }
+
+  .run-btn{ font-family: var(--display); font-weight:600; font-size:13.5px; background: var(--amber); color: var(--amber-ink); border:none; padding:11px 18px; border-radius:8px; cursor:pointer; transition: transform 0.12s ease; white-space: nowrap; }
+  .run-btn:hover{ transform: translateY(-1px); }
+  .run-btn:active{ transform: translateY(0); }
+  .run-btn.check-btn{ background: var(--teal); color:#fff; }
+
+  .playground textarea{
+    width:100%; box-sizing:border-box; display:block;
+    background: rgba(255,255,255,0.03); border:none; resize:vertical;
+    color:#E7ECE4; font-family: var(--mono); font-size:13.5px; line-height:1.7;
+    padding: 16px 18px; min-height: 74px; outline:none;
+  }
+
+  .pg-inputs-panel{ padding: 12px 18px; border-top:1px solid rgba(255,255,255,0.08); display:none; flex-direction:column; gap:8px; background: rgba(255,255,255,0.02); }
+  .pg-inputs-panel .input-row{ display:flex; align-items:center; gap:10px; }
+  .pg-inputs-panel label{ font-family: var(--mono); font-size:11.5px; color: rgba(231,236,228,0.55); white-space:nowrap; flex-shrink:0; }
+  .pg-inputs-panel input{ flex:1; background: rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.16); color:#F5F7F1; font-family: var(--mono); font-size:13px; padding:7px 10px; border-radius:6px; min-width:0; }
+  .pg-inputs-panel input::placeholder{ color: rgba(245,247,241,0.35); }
+
+  .playground-actions{ display:flex; align-items:center; gap:10px; padding: 10px 18px; border-top:1px solid rgba(255,255,255,0.08); border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
+  .playground-hint{ font-family: var(--mono); font-size:11.5px; color: rgba(231,236,228,0.45); }
+  .playground-output-label{ padding: 10px 18px 0 18px; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color: rgba(231,236,228,0.4); }
+  .playground-output{
+    padding: 10px 18px 18px 18px; font-family: var(--mono); font-size:13.5px; color:#E7ECE4;
+    white-space: pre-wrap; word-break: break-word; min-height: 40px;
+    tab-size: 4; -moz-tab-size: 4;
+  }
+  .playground-output .placeholder{ color: rgba(231,236,228,0.35); }
+  .playground-output .error-line{ color:#FF9086; display:block; margin-top:8px; font-weight:600; }
+  .playground-output .error-note{ color: rgba(255,144,134,0.75); display:block; font-weight:400; font-size:12px; margin-top:4px; }
+
+  .result-banner{ margin: 0 18px 16px 18px; padding:11px 15px; border-radius:10px; font-family: var(--display); font-weight:600; font-size:13px; }
+  .result-banner.hidden{ display:none; }
+  .result-banner.pass{ background: rgba(31,149,138,0.18); color: #9CE8DC; }
+  .result-banner.fail{ background: rgba(231,92,75,0.18); color: #FFB4A8; }
+
+  .lesson{ padding: 56px 0; border-top: 1px solid var(--line); }
+  .lesson.alt{ background: var(--paper-dim); }
+  .lesson-head{ display:flex; gap:20px; align-items:baseline; margin-bottom:22px; }
+  .lesson-num{ font-family: var(--display); font-weight:700; font-size:15px; color: var(--teal); background: var(--teal-soft); border-radius:999px; width:40px; height:40px; min-width:40px; display:flex; align-items:center; justify-content:center; }
+  .lesson-head h2{ font-size: clamp(1.35rem, 3.1vw, 1.85rem); }
+  .lesson-intro{ color: var(--ink-soft); max-width: 68ch; font-size: 1.02rem; margin-bottom: 20px; }
+
+  .split-2{ display:grid; grid-template-columns: 1fr 1fr; gap:22px; align-items:start; margin: 18px 0; }
+  .split-2 p{ font-size: 0.98rem; }
+
+  .term-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
+  .term-grid.quad{ grid-template-columns: repeat(4, 1fr); }
+  .term-grid.compact{ grid-template-columns: repeat(3, 1fr); }
+  .term-grid.seven{ grid-template-columns: repeat(4, 1fr); }
+  .term-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+  .term-card h3{ font-size: 1rem; margin-bottom:5px; font-family: var(--mono); }
+  .term-card p{ font-size: 0.87rem; color: var(--ink-soft); margin-bottom:0; }
+  .term-card .ex{ display:block; margin-top:8px; font-family: var(--mono); font-size:11px; color: var(--teal); background: var(--teal-soft); padding:3px 7px; border-radius:6px; }
+
+  .playground{ margin-bottom: 20px; }
+
+  .callout{ margin: 18px 0; background: var(--coral-soft); border:1px solid rgba(231,92,75,0.25); border-radius: var(--radius); padding:16px 20px; display:flex; gap:14px; align-items:flex-start; }
+  .callout .icon{ width:24px; height:24px; min-width:24px; color: var(--coral); margin-top:2px; }
+  .callout p{ margin:0; color: var(--ink); font-size:0.95rem; }
+  .callout strong{ font-family: var(--display); }
+  .callout.teal{ background: var(--teal-soft); border-color: rgba(31,149,138,0.25); }
+  .callout.teal .icon{ color: var(--teal); }
+  .callout.amber{ background: var(--amber-soft); border-color: rgba(242,183,5,0.35); }
+  .callout.amber .icon{ color: var(--amber-ink); }
+
+  .code-compare{ display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin: 18px 0; }
+  .code-card{ background: var(--ink); border-radius: var(--radius); overflow:hidden; }
+  .code-card .code-head{ display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background: rgba(255,255,255,0.04); font-family: var(--display); font-size:12.5px; font-weight:600; color:#E7ECE4; }
+  .code-card pre{ margin:0; padding:14px 14px 16px 14px; font-family: var(--mono); font-size:13px; color:#DCE7DC; overflow-x:auto; line-height:1.6; }
+  .code-card .out{ background: rgba(255,255,255,0.03); border-top:1px solid rgba(255,255,255,0.07); padding: 10px 14px; font-family: var(--mono); font-size:12.5px; color:#B9EAC0; white-space:pre-wrap; }
+  .code-card .out .lab{ color: rgba(231,236,228,0.4); font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:4px; }
+
+  .predict-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:20px; }
+  .predict-card .q{ font-family: var(--display); font-weight:600; font-size:0.92rem; margin-bottom:10px; color: var(--ink-soft); }
+  .predict-card pre{ background: var(--ink); color:#DCE7DC; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:12.5px; overflow-x:auto; margin:0 0 12px 0; }
+  .reveal-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--teal-soft); color: var(--teal); border:none; padding:9px 18px; border-radius:999px; cursor:pointer; }
+  .reveal-btn:hover{ filter: brightness(0.95); }
+
+  .yesno-row{ display:flex; gap:10px; }
+  .yesno-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--paper-dim); color: var(--ink); border:1px solid var(--line); padding:9px 22px; border-radius:999px; cursor:pointer; transition: all 0.15s ease; }
+  .yesno-btn:hover{ border-color: var(--teal); }
+  .yesno-btn.chosen.correct{ background: var(--teal); color:#fff; border-color: var(--teal); }
+  .yesno-btn.chosen.incorrect{ background: var(--coral); color:#fff; border-color: var(--coral); }
+  .yesno-btn.reveal-correct{ border-color: var(--teal); color: var(--teal); font-weight:700; }
+  .verdict{ font-family: var(--display); font-weight:700; font-size:0.92rem; margin-bottom:10px; }
+  .verdict.correct{ color: var(--teal); }
+  .verdict.incorrect{ color: var(--coral); }
+
+  .answer-panel{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); display:none; }
+  .answer-panel.show{ display:block; }
+  .answer-panel .out-label{ font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .answer-panel pre{ background:#12261F; color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0 0 10px 0; white-space:pre-wrap; }
+  .answer-panel .explain{ font-size:0.9rem; color: var(--ink-soft); margin-bottom:0; }
+
+  .challenge-split{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap:22px; align-items:start; margin: 18px 0; }
+  .challenge-info h4{ font-size:1rem; margin-bottom:10px; }
+  .challenge-info p{ font-size:0.94rem; color: var(--ink-soft); }
+  .target-box{ margin-top:14px; }
+  .target-box .target-label{ display:block; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .target-box pre{ background: var(--ink); color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0; white-space:pre-wrap; }
+
+  .div-table{ width:100%; border-collapse: collapse; margin: 18px 0; border-radius: var(--radius); overflow:hidden; border: 1px solid var(--line); }
+  .div-table th{ font-family: var(--display); font-size:0.88rem; padding:12px 14px; text-align:left; color:#fff; background: var(--ink); }
+  .div-table th code{ background: transparent; color: inherit; padding: 0; }
+  .div-table td{ padding:12px 14px; font-size:0.88rem; color: var(--ink-soft); border-top:1px solid var(--line); background: var(--card); vertical-align: top; }
+  .div-table td.label{ font-family: var(--display); font-weight:600; color: var(--ink); background: var(--paper-dim); white-space:nowrap; }
+  .div-table code{ font-size: 0.95em; }
+
+  .op-flow{ display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:10px; margin: 18px 0; font-family: var(--mono); font-size:13px; }
+  .op-flow .step{ background: var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 16px; color: var(--ink); }
+  .op-flow .arrow{ color: var(--teal); font-weight:700; }
+
+  footer{ padding: 46px 0 70px 0; text-align:center; }
+  footer .wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  footer .brand{ font-family: var(--display); font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px; }
+  footer .brand .dot{ width:8px; height:8px; border-radius:50%; background: var(--amber); }
+  footer p{ margin:0; color: var(--ink-faint); font-size:13.5px; }
+
+  @media (max-width: 760px){
+    .term-grid, .code-compare, .split-2, .challenge-split{ grid-template-columns: 1fr; }
+    .term-grid.quad, .term-grid.seven{ grid-template-columns: repeat(2, 1fr); }
+    .term-grid.compact{ grid-template-columns: repeat(2, 1fr); }
+    body{ font-size:17px; }
+    .lesson{ padding: 44px 0; }
+    .div-table{ font-size: 0.8rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Python Notes</div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="eyebrow">Chapter 4: Input, Type Conversion &amp; Math Operators</div>
+  <h1>Stop guessing the value.<br><span class="accent">Ask for it.</span></h1>
+  <p class="lede">Every program so far has used values we typed directly into the code. Real programs ask the person using them — and Python has one tool for exactly that: <code>input()</code>. Try it below by typing whatever you'd like the "user" to type.</p>
+
+  <div class="playground" id="pgHero">
+    <div class="darkbox" style="margin:0;">
+      <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">try_input.py</span></div>
+      <textarea class="pg-input" spellcheck="false" rows="2">name = input("What is your name? ")
+print("Nice to meet you,", name)</textarea>
+      <div class="pg-inputs-panel"></div>
+      <div class="playground-actions">
+        <button class="run-btn pg-run" type="button">Run ▶</button>
+        <span class="playground-hint">fill in the simulated input, then press Run</span>
+      </div>
+      <div class="playground-output-label">Output</div>
+      <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 01 GETTING INPUT ============ -->
+<section class="lesson" id="getting-input">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">01</div><h2>Getting Input From the User</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> user input is any information a person types into a running program while it's going. Without it, a program can only ever work with values already written into its code — <code>input()</code> is Python's built-in tool for asking the person using the program to type something.</p>
+
+    <div class="op-flow">
+      <span class="step">Person types something</span><span class="arrow">→</span>
+      <span class="step">input() receives it</span><span class="arrow">→</span>
+      <span class="step">stored in a variable</span><span class="arrow">→</span>
+      <span class="step">program uses it</span>
+    </div>
+
+    <p>When taking input, you can ask a prompt. A prompt is the message <code>input()</code> displays to tell the person what to type. It's entirely optional — <code>input()</code> on its own works too, it just won't say anything first.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>no_prompt.py</span></div>
+        <pre>input()</pre>
+        <div class="out"><span class="lab">Waits silently for input</span>no message shown</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>with_prompt.py</span></div>
+        <pre>input(<span style="color:#7FD9CF;">"What is your name? "</span>)</pre>
+        <div class="out"><span class="lab">Waits, but asks first</span>What is your name?</div>
+      </div>
+    </div>
+
+    <div class="callout teal">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p><strong><code>input()</code> pauses everything.</strong> Once Python reaches an <code>input()</code> line, it stops and waits — nothing else in the program runs until the person types something and presses Enter.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 INPUT ALWAYS RETURNS A STRING ============ -->
+<section class="lesson alt" id="input-is-string">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">02</div><h2>input() Always Returns a String</h2></div>
+    <p class="lesson-intro">This is the single most important thing to remember about <code>input()</code>: whatever the person types, Python stores it as a <code>str</code> — even if they typed nothing but digits.</p>
+
+    <div class="predict-card yesno-card" style="margin-bottom: 20px;" data-answer="no">
+      <div class="q">If the user types <code>13</code>, does <code>input()</code> give you the number 13?</div>
+      <pre>age = input("How old are you? ")</pre>
+      <div class="yesno-row">
+        <button class="yesno-btn" data-choice="yes">Yes</button>
+        <button class="yesno-btn" data-choice="no">No</button>
+      </div>
+      <div class="answer-panel" id="ansInputStr">
+        <div class="verdict"></div>
+        <p class="explain">Even though the person typed digits, Python stores exactly what was typed as text. <code>age</code> holds the string <code>"13"</code>, not the number 13 — see for yourself below.</p>
+      </div>
+    </div>
+
+    <div class="playground" id="pgInputType">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">check_type.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="3">age = input("How old are you? ")
+print(age)
+print(type(age))</textarea>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">type any number as the simulated input</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 INPUT AND VARIABLES ============ -->
+<section class="lesson" id="input-and-variables">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">03</div><h2>Input Flows Into Variables</h2></div>
+    <p class="lesson-intro"><code>input()</code> is rarely used on its own — almost always, its result is stored in a variable straight away, so the rest of the program can use it.</p>
+
+    <div class="playground" id="pgTwoInputs">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">two_inputs.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="4">name = input("Enter your name: ")
+colour = input("Enter your favourite colour: ")
+
+print(name)
+print(colour)</textarea>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">two separate input() calls, two separate simulated values</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+
+    <p style="font-size:0.95rem;">Both <code>name</code> and <code>colour</code> start out as strings — that's true no matter what the person types.</p>
+  </div>
+</section>
+
+<!-- ============ 04 WHY TYPE CONVERSION ============ -->
+<section class="lesson alt" id="why-conversion">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">04</div><h2>Type Conversion — Why We Need It?</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> type conversion (also called typecasting) means changing a value from one data type to another.</p>
+    <p>We need it because <code>input()</code> always hands back a string — even when we actually wanted a number to do maths with.</p>
+
+    <div class="playground" id="pgConcatSurprise">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">surprise.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="3">a = input("Enter a number: ")
+b = input("Enter another number: ")
+print(a + b)</textarea>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">try 5 and 3 — expecting 8?</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+      <p><strong>What happened?</strong> Since <code>a</code> and <code>b</code> are both text, <code>+</code> joins them together instead of adding their numbers — <code>"5" + "3"</code> becomes <code>"53"</code>, not <code>8</code>. To actually add the numbers, we need to convert them first.</p>
+    </div>
+
+    <p style="font-size:0.98rem;">Python gives you four conversion tools for this — each named after the data type it converts <em>into</em>:</p>
+
+    <div class="term-grid quad">
+      <div class="term-card"><h3>int()</h3><p>Converts to a whole number.</p></div>
+      <div class="term-card"><h3>float()</h3><p>Converts to a decimal number.</p></div>
+      <div class="term-card"><h3>str()</h3><p>Converts to text.</p></div>
+      <div class="term-card"><h3>bool()</h3><p>Converts to True or False.</p></div>
+    </div>
+
+    <p style="font-size:0.98rem; margin-top:18px;">The pattern you'll use constantly, combining <code>input()</code> with one of these:</p>
+
+    <div class="code-card" style="max-width:400px;">
+      <div class="code-head"><span>pattern.py</span></div>
+      <pre>age = <span style="color:#F2C879;">int</span>(input(<span style="color:#7FD9CF;">"How old are you? "</span>))</pre>
+      <div class="out"><span class="lab">Reading right to left</span>input() returns a string → int() converts it → the result is stored in age</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 INT() ============ -->
+<section class="lesson" id="int-conversion">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">05</div><h2>int() Up Close</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> <code>int()</code> converts a suitable value into a whole number. It works on numeric-looking strings and on floats — with one important detail for floats.</p>
+
+    <div class="predict-card" style="margin-bottom: 20px;">
+      <div class="q">Predict the output — does this round?</div>
+      <pre>print(int(7.9))</pre>
+      <button class="reveal-btn" data-target="ansIntTrunc">Reveal output</button>
+      <div class="answer-panel" id="ansIntTrunc">
+        <div class="out-label">Output</div>
+        <pre>7</pre>
+        <p class="explain"><code>int()</code> doesn't round — it simply <strong>removes</strong> everything after the decimal point. <code>7.9</code> becomes <code>7</code>, not <code>8</code>. The same is true for negative numbers: <code>int(-7.9)</code> gives <code>-7</code>, not <code>-8</code>.</p>
+      </div>
+    </div>
+
+    <div class="playground" id="pgIntExplore">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">int_examples.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="4">print(int("25"))
+print(int(25.8))
+
+print(int("hello"))</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">the last line is deliberately invalid — see what happens</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v5M12 15.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p><strong>Not every string can become a number.</strong> <code>int("hello")</code> stops the program with an error, because "hello" isn't a number in any form. Later chapters cover how to handle errors like this gracefully — for now, just know that invalid conversions do stop the program.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 FLOAT() ============ -->
+<section class="lesson alt" id="float-conversion">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">06</div><h2>float() Up Close</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> <code>float()</code> converts a suitable value into a decimal number. Use it instead of <code>int()</code> whenever the person might reasonably type a number with a decimal point, like a price or a height.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>str_to_float.py</span></div>
+        <pre>print(<span style="color:#F2C879;">float</span>(<span style="color:#7FD9CF;">"12.5"</span>))</pre>
+        <div class="out"><span class="lab">Output</span>12.5</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>int_to_float.py</span></div>
+        <pre>print(<span style="color:#F2C879;">float</span>(<span style="color:#F2C879;">10</span>))</pre>
+        <div class="out"><span class="lab">Output</span>10.0</div>
+      </div>
+    </div>
+
+    <div class="playground" id="pgFloatInput">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">price_input.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="2">price = float(input("Enter the price: "))
+print(price)</textarea>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">try a decimal price, like 19.99</span>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 STR() ============ -->
+<section class="lesson" id="str-conversion">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">07</div><h2>str() Up Close</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> <code>str()</code> converts a value into its text representation. The value itself doesn't change — you just get a text version of it, useful whenever you need to treat a number like text.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>str_int.py</span></div>
+        <pre>print(<span style="color:#F2C879;">str</span>(<span style="color:#F2C879;">25</span>))</pre>
+        <div class="out"><span class="lab">Value is now text</span>"25" (a str)</div>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>str_float.py</span></div>
+        <pre>print(<span style="color:#F2C879;">str</span>(<span style="color:#F2C879;">12.5</span>))</pre>
+        <div class="out"><span class="lab">Value is now text</span>"12.5" (a str)</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.95rem;">We won't do much with text itself yet — actual string operations get their own chapter — but knowing <code>str()</code> exists rounds out the set of three conversion tools.</p>
+  </div>
+</section>
+
+<!-- ============ 08 CONVERSION + TYPE() ============ -->
+<section class="lesson alt" id="conversion-and-type">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">08</div><h2>Conversion + type(): Proving the Type Actually Changed</h2></div>
+    <p class="lesson-intro"><code>type()</code>, from the last chapter, is the perfect way to confirm a conversion actually worked — check the type before, convert, then check again.</p>
+
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Prove the conversion</h4>
+        <p>Add <code>type()</code> checks before and after converting <code>age</code>, so the output reads exactly:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>Enter your age: 20
+&lt;class 'str'&gt;
+&lt;class 'int'&gt;</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgConvertType" style="margin:0;" data-expected="Enter your age: 20&#10;&lt;class 'str'&gt;&#10;&lt;class 'int'&gt;" data-fixed-inputs='["20"]'>
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">prove_conversion.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="4">age = input("Enter your age: ")
+
+age = int(age)</textarea>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+    <p style="font-family:var(--body); color:var(--ink-faint); font-size:0.85rem; margin-top:10px;">This challenge always simulates typing <strong>20</strong> for the input, so Check can compare against one exact answer.</p>
+  </div>
+</section>
+
+<!-- ============ 09 ADD SUB MUL ============ -->
+<section class="lesson" id="basic-operators">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">09</div><h2>Meet the Math Operators</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> an operator is a symbol that tells Python to perform a specific operation on the values around it.</p>
+    <p>Python has seven operators you'll use constantly. Here they all are, before we look at each one closely.</p>
+
+    <div class="term-grid seven">
+      <div class="term-card"><h3>+</h3><p>Addition</p><span class="ex">10 + 5</span></div>
+      <div class="term-card"><h3>-</h3><p>Subtraction</p><span class="ex">10 - 5</span></div>
+      <div class="term-card"><h3>*</h3><p>Multiplication</p><span class="ex">10 * 5</span></div>
+      <div class="term-card"><h3>/</h3><p>Division</p><span class="ex">10 / 5</span></div>
+      <div class="term-card"><h3>//</h3><p>Floor division</p><span class="ex">10 // 3</span></div>
+      <div class="term-card"><h3>%</h3><p>Modulus</p><span class="ex">10 % 3</span></div>
+      <div class="term-card"><h3>**</h3><p>Exponentiation</p><span class="ex">10 ** 2</span></div>
+    </div>
+
+    <div class="split-2" style="margin-top:20px;">
+      <div>
+        <p style="font-size:0.98rem;">The first 3 operators (addition, subtraction, multiplication) behave exactly as you'd expect from ordinary arithmetic.</p>
+        <div class="code-card" style="margin:0;">
+          <div class="code-head"><span>simple_maths.py</span></div>
+          <pre>print(<span style="color:#F2C879;">10</span> + <span style="color:#F2C879;">5</span>)
+print(<span style="color:#F2C879;">10</span> - <span style="color:#F2C879;">5</span>)
+print(<span style="color:#F2C879;">10</span> * <span style="color:#F2C879;">5</span>)</pre>
+          <div class="out"><span class="lab">Output</span>15
+5
+50</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.98rem;">They work with variables too — this is where maths starts becoming genuinely useful.</p>
+        <div class="playground" id="pgPriceQty" style="margin:0;">
+          <div class="darkbox" style="margin:0;">
+            <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">total_cost.py</span></div>
+            <textarea class="pg-input" spellcheck="false" rows="4">price = 20
+quantity = 3
+
+total = price * quantity
+print(total)</textarea>
+            <div class="playground-actions">
+              <button class="run-btn pg-run" type="button">Run ▶</button>
+              <span class="playground-hint">try changing the numbers</span>
+            </div>
+            <div class="playground-output-label">Output</div>
+            <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10 DIVISION FAMILY ============ -->
+<section class="lesson alt" id="division-family">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">10</div><h2>Three Flavors of Division: /, // and %</h2></div>
+    <p class="lesson-intro">Python has three separate operators involving division, and each answers a different question. Here's what all three give you for the same pair of numbers.</p>
+
+    <table class="div-table">
+      <thead><tr><th></th><th><code>7 / 2</code></th><th><code>7 // 2</code></th><th><code>7 % 2</code></th></tr></thead>
+      <tbody>
+        <tr><td class="label">Result</td><td><code>3.5</code></td><td><code>3</code></td><td><code>1</code></td></tr>
+        <tr><td class="label">Question it answers</td><td>What's the exact result?</td><td>How many whole times does 2 fit into 7?</td><td>What's left over after that?</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>/ (Division):</strong> ordinary division always produces a <code>float</code> result, even when the numbers divide evenly.</p>
+    <div class="predict-card">
+      <div class="q">Predict the output</div>
+      <pre>print(10 / 2)
+print(7 / 2)</pre>
+      <button class="reveal-btn" data-target="ansDivFloat">Reveal output</button>
+      <div class="answer-panel" id="ansDivFloat">
+        <div class="out-label">Output</div>
+        <pre>5.0
+3.5</pre>
+        <p class="explain">Notice <code>10 / 2</code> gives <code>5.0</code>, not <code>5</code> — <code>/</code> always returns a float, so the type stays consistent no matter what numbers you divide.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:22px;"><strong>// (Floor Division):</strong> it divides, then rounds the result <em>down</em> to the nearest whole number — not simply "chops off the decimal" the way <code>int()</code> does.</p>
+    <div class="predict-card">
+      <div class="q">Predict the output — this is where floor division gets interesting</div>
+      <pre>print(7 // 2)
+print(-7 // 2)</pre>
+      <button class="reveal-btn" data-target="ansFloorNeg">Reveal output</button>
+      <div class="answer-panel" id="ansFloorNeg">
+        <div class="out-label">Output</div>
+        <pre>3
+-4</pre>
+        <p class="explain"><code>7 // 2</code> is <code>3</code> — no surprise there. But <code>-7 // 2</code> is <code>-4</code>, not <code>-3</code>. That's because "floor" always rounds <em>down</em> toward negative infinity: -3.5 rounds down to -4, not up toward zero.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:22px;"><strong>% (Modulus):</strong> it gives the remainder left over after division.</p>
+    <div class="predict-card">
+      <div class="q">Predict the output</div>
+      <pre>print(10 % 3)
+print(15 % 5)
+print(17 % 4)</pre>
+      <button class="reveal-btn" data-target="ansModulus">Reveal output</button>
+      <div class="answer-panel" id="ansModulus">
+        <div class="out-label">Output</div>
+        <pre>1
+0
+1</pre>
+        <p class="explain">A remainder of <code>0</code> — like <code>15 % 5</code> — means one number divides evenly into the other. That's a genuinely useful thing to know, and <code>%</code> is the tool that tells you.</p>
+      </div>
+    </div>
+
+    <div class="challenge-split" style="margin-top:22px;">
+      <div class="challenge-info">
+        <h4>🎯 Your turn</h4>
+        <p>Using <code>17</code> and <code>5</code>, print the ordinary division result, the floor division result, and the remainder — one per line, in that order:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>3.4
+3
+2</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgDivisionChallenge" style="margin:0;" data-expected="3.4&#10;3&#10;2">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">division_challenge.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="3">print(17 / 5)
+print(17 / 5)
+print(17 / 5)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 EXPONENTIATION ============ -->
+<section class="lesson" id="exponent">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">11</div><h2>Exponentiation **</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> <code>**</code> raises a number to a power — multiplying a number by itself a set number of times.</p>
+
+    <div class="split-2">
+      <div class="code-card" style="margin:0;">
+        <div class="code-head"><span>power.py</span></div>
+        <pre>print(<span style="color:#F2C879;">2</span> ** <span style="color:#F2C879;">3</span>)
+print(<span style="color:#F2C879;">5</span> ** <span style="color:#F2C879;">2</span>)</pre>
+        <div class="out"><span class="lab">Output</span>8
+25</div>
+      </div>
+      <div>
+        <p><code>2 ** 3</code> means "multiply 2 by itself 3 times": <code>2 * 2 * 2 = 8</code>.</p>
+        <p><code>5 ** 2</code> — often read as "5 squared" — means <code>5 * 5 = 25</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12 EXPRESSIONS ============ -->
+<section class="lesson alt" id="expressions">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">12</div><h2>Expressions</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> an expression is any combination of values, variables, and operators that Python can evaluate down to a single result.</p>
+
+    <div class="code-card" style="max-width:340px;">
+      <div class="code-head"><span>expressions.py</span></div>
+      <pre><span style="color:#F2C879;">5</span> + <span style="color:#F2C879;">3</span>
+<span style="color:#F2C879;">10</span> * <span style="color:#F2C879;">2</span>
+price * quantity</pre>
+      <div class="out"><span class="lab">All three are expressions</span>each evaluates to one value</div>
+    </div>
+
+    <div class="callout amber">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v5M12 15.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p><strong>An expression on its own line shows nothing.</strong> Writing <code>5 + 3</code> by itself does the maths, but the result is thrown away unless you <code>print()</code> it or store it in a variable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13 BIDMAS ============ -->
+<section class="lesson" id="bidmas">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">13</div><h2>Order of Operations: BIDMAS</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> when an expression has more than one operator, Python doesn't just work left to right — it follows the same order of operations you learned in maths class, remembered by <strong>BIDMAS</strong>.</p>
+
+    <div class="term-grid compact">
+      <div class="term-card"><h3>B</h3><p>Brackets</p></div>
+      <div class="term-card"><h3>I</h3><p>Indices / powers</p></div>
+      <div class="term-card"><h3>D M</h3><p>Division &amp; Multiplication</p></div>
+      <div class="term-card"><h3>A S</h3><p>Addition &amp; Subtraction</p></div>
+    </div>
+
+    <div class="predict-card yesno-card" data-answer="no" style="margin-top:20px;">
+      <div class="q">Does division always happen before multiplication, since D comes before M in "BIDMAS"?</div>
+      <div class="yesno-row">
+        <button class="yesno-btn" data-choice="yes">Yes</button>
+        <button class="yesno-btn" data-choice="no">No</button>
+      </div>
+      <div class="answer-panel" id="ansSamePrecedence">
+        <div class="verdict"></div>
+        <p class="explain">Division and multiplication are actually equal in precedence — same for addition and subtraction. When operators share a precedence level, Python evaluates them in the order they appear, left to right.</p>
+      </div>
+    </div>
+
+    <div class="predict-card" style="margin-top:18px;">
+      <div class="q">Predict the output</div>
+      <pre>print(2 + 3 * 4)</pre>
+      <button class="reveal-btn" data-target="ansBidmas1">Reveal output</button>
+      <div class="answer-panel" id="ansBidmas1">
+        <div class="out-label">Output</div>
+        <pre>14</pre>
+        <p class="explain">Multiplication happens before addition: <code>3 * 4</code> is <code>12</code> first, then <code>2 + 12 = 14</code>.</p>
+      </div>
+    </div>
+
+    <div class="predict-card" style="margin-top:18px;">
+      <div class="q">Now with brackets — predict the output</div>
+      <pre>print((2 + 3) * 4)</pre>
+      <button class="reveal-btn" data-target="ansBidmas2">Reveal output</button>
+      <div class="answer-panel" id="ansBidmas2">
+        <div class="out-label">Output</div>
+        <pre>20</pre>
+        <p class="explain">Brackets are evaluated first no matter what: <code>2 + 3 = 5</code>, then <code>5 * 4 = 20</code>. Brackets are how you override Python's default order whenever you need to.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14 BRINGING IT TOGETHER ============ -->
+<section class="lesson alt" id="bringing-together">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">14</div><h2>Bringing It All Together</h2></div>
+    <p class="lesson-intro">A complete, realistic program combines everything from this chapter: <strong>input</strong> to collect information, <strong>conversion</strong> to make it usable, <strong>variables</strong> to hold it, and an <strong>expression</strong> to calculate something useful from it.</p>
+
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Build a total-cost calculator</h4>
+        <p>Fix the script so it reads a price and a quantity, multiplies them, and prints the total. With a price of <code>19.99</code> and a quantity of <code>3</code>, the output should read exactly:</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>Enter the price: 19.99
+Enter the quantity: 3
+59.97</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgCapstone" style="margin:0;" data-expected="Enter the price: 19.99&#10;Enter the quantity: 3&#10;59.97" data-fixed-inputs='["19.99","3"]'>
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">total_calculator.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="5">price = input("Enter the price: ")
+quantity = input("Enter the quantity: ")
+
+total = price * quantity
+
+print(total)</textarea>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+    <p style="font-family:var(--body); color:var(--ink-faint); font-size:0.85rem; margin-top:10px;">This challenge always simulates <strong>19.99</strong> and <strong>3</strong> as the two inputs, so Check has one exact answer to compare against.</p>
+  </div>
+</section>
+
+<!-- ============ 15 RECAP ============ -->
+<section class="lesson" id="recap">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">15</div><h2>Chapter Recap</h2></div>
+    <p class="lesson-intro">A quick-glance reference for revising later.</p>
+
+    <div class="term-grid compact">
+      <div class="term-card"><h3>input()</h3><p>Pauses the program and asks the user to type something. Always returns a str.</p></div>
+      <div class="term-card"><h3>Prompt</h3><p>The message input() displays before waiting.</p></div>
+      <div class="term-card"><h3>Type conversion</h3><p>Changing a value from one data type to another.</p></div>
+      <div class="term-card"><h3>int()</h3><p>Converts to a whole number. Truncates floats, doesn't round.</p></div>
+      <div class="term-card"><h3>float()</h3><p>Converts to a decimal number.</p></div>
+      <div class="term-card"><h3>str()</h3><p>Converts a value into its text form.</p></div>
+      <div class="term-card"><h3>/</h3><p>Division — always returns a float in Python 3.</p></div>
+      <div class="term-card"><h3>//</h3><p>Floor division — rounds down, even for negatives.</p></div>
+      <div class="term-card"><h3>%</h3><p>Modulus — the remainder after division.</p></div>
+      <div class="term-card"><h3>**</h3><p>Exponentiation — repeated multiplication.</p></div>
+      <div class="term-card"><h3>Expression</h3><p>Values, variables and operators combined into one result.</p></div>
+      <div class="term-card"><h3>BIDMAS</h3><p>Brackets, then powers, then ×÷ and +− left to right.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> Python Notes — Chapter 4</div>
+    <p>Input, Type Conversion &amp; Math Operators</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var fill = document.getElementById('progressFill');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop || document.body.scrollTop;
+    var height = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+    var pct = height > 0 ? (scrolled / height) * 100 : 0;
+    fill.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  var PY_KEYWORDS = ['False','None','True','and','as','assert','async','await','break','class',
+    'continue','def','del','elif','else','except','finally','for','from','global','if','import',
+    'in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield'];
+
+  function validateIdentifier(name){
+    if(name === '') return { valid:false, reason:"Variable names can't be empty." };
+    if(/\s/.test(name)) return { valid:false, reason:"Variable names can't contain spaces." };
+    if(/^[0-9]/.test(name)) return { valid:false, reason:"Variable names can't start with a number." };
+    if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)){
+      return { valid:false, reason:"Variable names can only contain letters, numbers, and underscores." };
+    }
+    if(PY_KEYWORDS.indexOf(name) !== -1){
+      return { valid:false, reason:"'" + name + "' is a reserved Python keyword and can't be used as a name." };
+    }
+    return { valid:true };
+  }
+
+  function processEscapes(s){
+    var out = '';
+    for(var i = 0; i < s.length; i++){
+      var c = s[i];
+      if(c === '\\' && i + 1 < s.length){
+        var next = s[i+1];
+        if(next === 'n'){ out += '\n'; i++; }
+        else if(next === 't'){ out += '\t'; i++; }
+        else if(next === '\\'){ out += '\\'; i++; }
+        else if(next === '"'){ out += '"'; i++; }
+        else if(next === "'"){ out += "'"; i++; }
+        else { out += c; }
+      } else { out += c; }
+    }
+    return out;
+  }
+
+  function formatPyFloat(n){
+    var s = String(n);
+    if(s.indexOf('.') === -1 && s.indexOf('e') === -1 && s.indexOf('E') === -1){
+      s += '.0';
+    }
+    return s;
+  }
+
+  function displayValue(v){
+    if(v.pytype === 'str') return v.value;
+    if(v.pytype === 'int') return v.value.toString();
+    if(v.pytype === 'float') return formatPyFloat(v.value);
+    if(v.pytype === 'bool') return v.value ? 'True' : 'False';
+    if(v.pytype === 'type') return v.value;
+    return String(v.value);
+  }
+
+  function scanString(s, startIdx){
+    var quoteChar = s[startIdx];
+    var i = startIdx + 1, content = '';
+    while(i < s.length){
+      var ch = s[i];
+      if(ch === '\\' && i + 1 < s.length){ content += ch + s[i+1]; i += 2; continue; }
+      if(ch === quoteChar) return { value: processEscapes(content), endIndex: i + 1 };
+      content += ch; i++;
+    }
+    return null;
+  }
+
+  function tokenize(s, lineNo){
+    var tokens = [], i = 0;
+    while(i < s.length){
+      var ch = s[i];
+      if(ch === ' ' || ch === '\t'){ i++; continue; }
+      if(ch === '"' || ch === "'"){
+        var strRes = scanString(s, i);
+        if(!strRes) return { error: { error:"SyntaxError: unterminated string literal", note:"Line " + lineNo } };
+        tokens.push({ type:'str', strValue: strRes.value });
+        i = strRes.endIndex; continue;
+      }
+      if(/[0-9]/.test(ch)){
+        var j = i;
+        while(j < s.length && /[0-9]/.test(s[j])) j++;
+        var isFloat = false;
+        if(s[j] === '.' && /[0-9]/.test(s[j+1] || '')){
+          isFloat = true; j++;
+          while(j < s.length && /[0-9]/.test(s[j])) j++;
+        }
+        var numStr = s.slice(i, j);
+        if(isFloat) tokens.push({ type:'num', isFloat:true, numValue: parseFloat(numStr) });
+        else tokens.push({ type:'num', isFloat:false, bigValue: BigInt(numStr) });
+        i = j; continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var k = i;
+        while(k < s.length && /[A-Za-z0-9_]/.test(s[k])) k++;
+        tokens.push({ type:'ident', value: s.slice(i, k) });
+        i = k; continue;
+      }
+      if(ch === '*' && s[i+1] === '*'){ tokens.push({ type:'op', value:'**' }); i += 2; continue; }
+      if(ch === '/' && s[i+1] === '/'){ tokens.push({ type:'op', value:'//' }); i += 2; continue; }
+      if(ch === '+' || ch === '-' || ch === '*' || ch === '/' || ch === '%'){ tokens.push({ type:'op', value: ch }); i++; continue; }
+      if(ch === '('){ tokens.push({ type:'lparen' }); i++; continue; }
+      if(ch === ')'){ tokens.push({ type:'rparen' }); i++; continue; }
+      return { error: { error:"SyntaxError: invalid syntax", note:"Line " + lineNo } };
+    }
+    return { error:null, tokens: tokens };
+  }
+
+  function convertToInt(argRes, lineNo){
+    if(argRes.pytype === 'int') return { ok:true, pytype:'int', value: argRes.value };
+    if(argRes.pytype === 'float') return { ok:true, pytype:'int', value: BigInt(Math.trunc(argRes.value)) };
+    if(argRes.pytype === 'bool') return { ok:true, pytype:'int', value: argRes.value ? 1n : 0n };
+    if(argRes.pytype === 'str'){
+      var s = argRes.value.trim();
+      var m = s.match(/^([+-]?)(\d+)$/);
+      if(!m) return { ok:false, error:"ValueError: invalid literal for int() with base 10: '" + argRes.value + "'", note:"Line " + lineNo };
+      var sign = m[1] === '-' ? -1n : 1n;
+      return { ok:true, pytype:'int', value: sign * BigInt(m[2]) };
+    }
+    return { ok:false, error:"TypeError: int() argument must be a string or a number", note:"Line " + lineNo };
+  }
+  function convertToFloat(argRes, lineNo){
+    if(argRes.pytype === 'float') return { ok:true, pytype:'float', value: argRes.value };
+    if(argRes.pytype === 'int') return { ok:true, pytype:'float', value: Number(argRes.value) };
+    if(argRes.pytype === 'bool') return { ok:true, pytype:'float', value: argRes.value ? 1 : 0 };
+    if(argRes.pytype === 'str'){
+      var s = argRes.value.trim();
+      if(!/^[+-]?(\d+(\.\d+)?|\.\d+)$/.test(s)) return { ok:false, error:"ValueError: could not convert string to float: '" + argRes.value + "'", note:"Line " + lineNo };
+      return { ok:true, pytype:'float', value: parseFloat(s) };
+    }
+    return { ok:false, error:"TypeError: float() argument must be a string or a number", note:"Line " + lineNo };
+  }
+  function convertToBool(argRes){
+    if(argRes.pytype === 'bool') return { ok:true, pytype:'bool', value: argRes.value };
+    if(argRes.pytype === 'int') return { ok:true, pytype:'bool', value: argRes.value !== 0n };
+    if(argRes.pytype === 'float') return { ok:true, pytype:'bool', value: argRes.value !== 0 };
+    if(argRes.pytype === 'str') return { ok:true, pytype:'bool', value: argRes.value !== '' };
+    return { ok:true, pytype:'bool', value: true };
+  }
+
+  function bigIntFloorDiv(a, b){
+    var q = a / b, r = a % b;
+    if(r !== 0n && ((r < 0n) !== (b < 0n))) q -= 1n;
+    return q;
+  }
+  function bigIntMod(a, b){
+    var r = a % b;
+    if(r !== 0n && ((r < 0n) !== (b < 0n))) r += b;
+    return r;
+  }
+  function floatMod(a, b){
+    var r = a % b;
+    if(r !== 0 && ((r < 0) !== (b < 0))) r += b;
+    return r;
+  }
+
+  function applyBinOp(leftRes, op, rightRes, lineNo){
+    if(op === '+' && leftRes.pytype === 'str' && rightRes.pytype === 'str'){
+      return { ok:true, pytype:'str', value: leftRes.value + rightRes.value };
+    }
+    var leftIsNum = (leftRes.pytype === 'int' || leftRes.pytype === 'float');
+    var rightIsNum = (rightRes.pytype === 'int' || rightRes.pytype === 'float');
+    if(!leftIsNum || !rightIsNum){
+      return { ok:false, error:"TypeError: unsupported operand type(s) for " + op, note:"Line " + lineNo };
+    }
+    var bothInt = (leftRes.pytype === 'int' && rightRes.pytype === 'int');
+    if(bothInt){
+      var a = leftRes.value, b = rightRes.value;
+      if(op === '+') return { ok:true, pytype:'int', value: a + b };
+      if(op === '-') return { ok:true, pytype:'int', value: a - b };
+      if(op === '*') return { ok:true, pytype:'int', value: a * b };
+      if(op === '/'){
+        if(b === 0n) return { ok:false, error:"ZeroDivisionError: division by zero", note:"Line " + lineNo };
+        return { ok:true, pytype:'float', value: Number(a) / Number(b) };
+      }
+      if(op === '//'){
+        if(b === 0n) return { ok:false, error:"ZeroDivisionError: integer division or modulo by zero", note:"Line " + lineNo };
+        return { ok:true, pytype:'int', value: bigIntFloorDiv(a, b) };
+      }
+      if(op === '%'){
+        if(b === 0n) return { ok:false, error:"ZeroDivisionError: integer division or modulo by zero", note:"Line " + lineNo };
+        return { ok:true, pytype:'int', value: bigIntMod(a, b) };
+      }
+      if(op === '**'){
+        if(b < 0n) return { ok:true, pytype:'float', value: Math.pow(Number(a), Number(b)) };
+        return { ok:true, pytype:'int', value: a ** b };
+      }
+    } else {
+      var af = (leftRes.pytype === 'int') ? Number(leftRes.value) : leftRes.value;
+      var bf = (rightRes.pytype === 'int') ? Number(rightRes.value) : rightRes.value;
+      if(op === '+') return { ok:true, pytype:'float', value: af + bf };
+      if(op === '-') return { ok:true, pytype:'float', value: af - bf };
+      if(op === '*') return { ok:true, pytype:'float', value: af * bf };
+      if(op === '/'){
+        if(bf === 0) return { ok:false, error:"ZeroDivisionError: float division by zero", note:"Line " + lineNo };
+        return { ok:true, pytype:'float', value: af / bf };
+      }
+      if(op === '//'){
+        if(bf === 0) return { ok:false, error:"ZeroDivisionError: float floor division by zero", note:"Line " + lineNo };
+        return { ok:true, pytype:'float', value: Math.floor(af / bf) };
+      }
+      if(op === '%'){
+        if(bf === 0) return { ok:false, error:"ZeroDivisionError: float modulo", note:"Line " + lineNo };
+        return { ok:true, pytype:'float', value: floatMod(af, bf) };
+      }
+      if(op === '**') return { ok:true, pytype:'float', value: Math.pow(af, bf) };
+    }
+    return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+  }
+
+  var BUILTINS = ['int', 'float', 'str', 'bool', 'type', 'input'];
+
+  function Parser(tokens, ctx, lineNo){
+    this.tokens = tokens; this.pos = 0; this.ctx = ctx; this.lineNo = lineNo; this.error = null;
+  }
+  Parser.prototype.peek = function(){ return this.tokens[this.pos]; };
+  Parser.prototype.fail = function(msg, note){ this.error = { error: msg, note: note || ("Line " + this.lineNo) }; return null; };
+
+  Parser.prototype.parseExpr = function(){
+    var left = this.parseTerm(); if(this.error) return null;
+    while(true){
+      var tok = this.peek();
+      if(tok && tok.type === 'op' && (tok.value === '+' || tok.value === '-')){
+        this.pos++;
+        var right = this.parseTerm(); if(this.error) return null;
+        left = applyBinOp(left, tok.value, right, this.lineNo);
+        if(!left.ok){ this.error = { error:left.error, note:left.note }; return null; }
+      } else break;
+    }
+    return left;
+  };
+  Parser.prototype.parseTerm = function(){
+    var left = this.parseFactor(); if(this.error) return null;
+    while(true){
+      var tok = this.peek();
+      if(tok && tok.type === 'op' && (tok.value === '*' || tok.value === '/' || tok.value === '//' || tok.value === '%')){
+        this.pos++;
+        var right = this.parseFactor(); if(this.error) return null;
+        left = applyBinOp(left, tok.value, right, this.lineNo);
+        if(!left.ok){ this.error = { error:left.error, note:left.note }; return null; }
+      } else break;
+    }
+    return left;
+  };
+  Parser.prototype.parseFactor = function(){
+    var tok = this.peek();
+    if(tok && tok.type === 'op' && tok.value === '-'){
+      this.pos++;
+      var inner = this.parseFactor(); if(this.error) return null;
+      if(inner.pytype === 'int') return { ok:true, pytype:'int', value: -inner.value };
+      if(inner.pytype === 'float') return { ok:true, pytype:'float', value: -inner.value };
+      this.error = { error:"TypeError: bad operand type for unary -", note:"Line " + this.lineNo };
+      return null;
+    }
+    return this.parsePower();
+  };
+  Parser.prototype.parsePower = function(){
+    var base = this.parseAtom(); if(this.error) return null;
+    var tok = this.peek();
+    if(tok && tok.type === 'op' && tok.value === '**'){
+      this.pos++;
+      var exp = this.parseFactor(); if(this.error) return null;
+      var r = applyBinOp(base, '**', exp, this.lineNo);
+      if(!r.ok){ this.error = { error:r.error, note:r.note }; return null; }
+      return r;
+    }
+    return base;
+  };
+  Parser.prototype.parseAtom = function(){
+    var tok = this.peek();
+    if(!tok) return this.fail("SyntaxError: invalid syntax");
+    if(tok.type === 'num'){
+      this.pos++;
+      return tok.isFloat ? { ok:true, pytype:'float', value: tok.numValue } : { ok:true, pytype:'int', value: tok.bigValue };
+    }
+    if(tok.type === 'str'){ this.pos++; return { ok:true, pytype:'str', value: tok.strValue }; }
+    if(tok.type === 'lparen'){
+      this.pos++;
+      var inner = this.parseExpr(); if(this.error) return null;
+      if(!this.peek() || this.peek().type !== 'rparen') return this.fail("SyntaxError: invalid syntax", "Line " + this.lineNo + " — missing closing parenthesis.");
+      this.pos++;
+      return inner;
+    }
+    if(tok.type === 'ident'){
+      if(tok.value === 'True'){ this.pos++; return { ok:true, pytype:'bool', value:true }; }
+      if(tok.value === 'False'){ this.pos++; return { ok:true, pytype:'bool', value:false }; }
+      var next = this.tokens[this.pos + 1];
+      if(BUILTINS.indexOf(tok.value) !== -1 && next && next.type === 'lparen'){
+        var name = tok.value;
+        this.pos += 2;
+        var argRes = null;
+        if(this.peek() && this.peek().type === 'rparen'){
+          argRes = null;
+        } else {
+          argRes = this.parseExpr(); if(this.error) return null;
+        }
+        if(!this.peek() || this.peek().type !== 'rparen') return this.fail("SyntaxError: invalid syntax", "Line " + this.lineNo + " — missing closing parenthesis.");
+        this.pos++;
+        return this.applyBuiltin(name, argRes);
+      }
+      if(PY_KEYWORDS.indexOf(tok.value) !== -1) return this.fail("SyntaxError: invalid syntax", "Line " + this.lineNo + " — '" + tok.value + "' is a reserved keyword.");
+      this.pos++;
+      if(Object.prototype.hasOwnProperty.call(this.ctx.variables, tok.value)){
+        var v = this.ctx.variables[tok.value];
+        return { ok:true, pytype: v.pytype, value: v.value };
+      }
+      return this.fail("NameError: name '" + tok.value + "' is not defined");
+    }
+    return this.fail("SyntaxError: invalid syntax");
+  };
+  Parser.prototype.applyBuiltin = function(name, argRes){
+    if(argRes && !argRes.ok){ this.error = { error: argRes.error, note: argRes.note }; return null; }
+    if(name === 'type'){
+      if(!argRes) return this.fail("SyntaxError: invalid syntax");
+      return { ok:true, pytype:'type', value: "<class '" + argRes.pytype + "'>" };
+    }
+    if(name === 'input'){
+      var promptText = argRes ? displayValue(argRes) : '';
+      var userValue = this.ctx.inputQueue.length > 0 ? this.ctx.inputQueue.shift() : '';
+      this.ctx.output += promptText + userValue + '\n';
+      return { ok:true, pytype:'str', value: userValue };
+    }
+    if(name === 'int'){
+      if(!argRes) return this.fail("TypeError: int() missing argument");
+      var r = convertToInt(argRes, this.lineNo);
+      if(!r.ok){ this.error = { error:r.error, note:r.note }; return null; }
+      return r;
+    }
+    if(name === 'float'){
+      if(!argRes) return this.fail("TypeError: float() missing argument");
+      var rf = convertToFloat(argRes, this.lineNo);
+      if(!rf.ok){ this.error = { error:rf.error, note:rf.note }; return null; }
+      return rf;
+    }
+    if(name === 'str'){
+      if(!argRes) return { ok:true, pytype:'str', value:'' };
+      return { ok:true, pytype:'str', value: displayValue(argRes) };
+    }
+    if(name === 'bool'){
+      if(!argRes) return { ok:true, pytype:'bool', value:false };
+      return convertToBool(argRes);
+    }
+    return this.fail("SyntaxError: invalid syntax");
+  };
+
+  function evaluatePiece(pieceStr, ctx, lineNo){
+    var tk = tokenize(pieceStr, lineNo);
+    if(tk.error) return { ok:false, error: tk.error.error, note: tk.error.note };
+    if(tk.tokens.length === 0) return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+    var p = new Parser(tk.tokens, ctx, lineNo);
+    var result = p.parseExpr();
+    if(p.error) return { ok:false, error: p.error.error, note: p.error.note };
+    if(p.pos !== tk.tokens.length) return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+    return result;
+  }
+
+  function parseStringLiteral(token){
+    if(token.length < 1) return null;
+    var quoteChar = token[0];
+    if(quoteChar !== '"' && quoteChar !== "'") return null;
+    var i = 1, content = '', closed = false;
+    for(; i < token.length; i++){
+      var ch = token[i];
+      if(ch === '\\' && i + 1 < token.length){ content += ch + token[i+1]; i++; continue; }
+      if(ch === quoteChar){ closed = true; i++; break; }
+      content += ch;
+    }
+    if(!closed) return null;
+    return { raw: content, rest: token.slice(i) };
+  }
+  function splitTopLevel(str){
+    var tokens = [], current = '', inQuote = null, escaped = false, depth = 0;
+    for(var i = 0; i < str.length; i++){
+      var ch = str[i];
+      if(inQuote){
+        current += ch;
+        if(escaped){ escaped = false; }
+        else if(ch === '\\'){ escaped = true; }
+        else if(ch === inQuote){ inQuote = null; }
+      } else {
+        if(ch === '"' || ch === "'"){ inQuote = ch; current += ch; }
+        else if(ch === '('){ depth++; current += ch; }
+        else if(ch === ')'){ depth--; current += ch; }
+        else if(ch === ',' && depth === 0){ tokens.push(current); current = ''; }
+        else { current += ch; }
+      }
+    }
+    if(inQuote) return { error: true };
+    tokens.push(current);
+    return { error:false, tokens: tokens };
+  }
+
+  function parsePrintPiece(token, ctx, lineNo, sepEndState){
+    var kwMatch = token.trim().match(/^(sep|end)\s*=\s*([\s\S]*)$/);
+    if(kwMatch){
+      var kwParsed = parseStringLiteral(kwMatch[2].trim());
+      if(kwParsed === null || kwParsed.rest.trim() !== ''){
+        return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+      }
+      var kwVal = processEscapes(kwParsed.raw);
+      if(kwMatch[1] === 'sep') sepEndState.sep = kwVal; else sepEndState.end = kwVal;
+      return { ok:true, isKw:true };
+    }
+    var res = evaluatePiece(token, ctx, lineNo);
+    if(!res.ok) return res;
+    return { ok:true, isKw:false, display: displayValue(res) };
+  }
+
+  function parseLine(rawLine, lineNo, ctx){
+    var trimmed = rawLine.trim();
+    if(trimmed === '' || trimmed.indexOf('#') === 0) return { ok:true };
+
+    var assignMatch = trimmed.match(/^([A-Za-z_]\w*)\s*=\s*([\s\S]+)$/);
+    if(assignMatch){
+      var varName = assignMatch[1];
+      if(PY_KEYWORDS.indexOf(varName) !== -1){
+        return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo + " — '" + varName + "' is a reserved keyword and can't be used as a variable name." };
+      }
+      var rhsRes = evaluatePiece(assignMatch[2], ctx, lineNo);
+      if(!rhsRes.ok) return rhsRes;
+      ctx.variables[varName] = { pytype: rhsRes.pytype, value: rhsRes.value };
+      return { ok:true };
+    }
+
+    if(!/^[A-Za-z_]\w*\s*\(/.test(trimmed) && /^[^=]+=[^=].*$/.test(trimmed)){
+      var brokenMatch = trimmed.match(/^([^=]+?)\s*=\s*([\s\S]+)$/);
+      var candidate = brokenMatch[1].trim();
+      var validation = validateIdentifier(candidate);
+      if(!validation.valid){
+        return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo + " — " + validation.reason };
+      }
+    }
+
+    var printMatch = trimmed.match(/^print\s*\(([\s\S]*)\)\s*;?\s*$/);
+    if(printMatch){
+      var split = splitTopLevel(printMatch[1]);
+      if(split.error) return { ok:false, error:"SyntaxError: unterminated string literal", note:"Line " + lineNo };
+      var pieces = [];
+      var sepEndState = { sep:' ', end:'\n' };
+      for(var i = 0; i < split.tokens.length; i++){
+        var tkStr = split.tokens[i].trim();
+        if(tkStr === '') continue;
+        var pieceRes = parsePrintPiece(tkStr, ctx, lineNo, sepEndState);
+        if(!pieceRes.ok) return pieceRes;
+        if(!pieceRes.isKw) pieces.push(pieceRes.display);
+      }
+      ctx.output += pieces.join(sepEndState.sep) + sepEndState.end;
+      return { ok:true };
+    }
+
+    var exprRes = evaluatePiece(trimmed, ctx, lineNo);
+    if(!exprRes.ok) return exprRes;
+    return { ok:true };
+  }
+
+  function runCode(codeText, inputValues){
+    var ctx = { variables: {}, inputQueue: (inputValues || []).slice(), output: '' };
+    var lines = codeText.split('\n');
+    var errorInfo = null;
+    for(var i = 0; i < lines.length; i++){
+      var res;
+      try{ res = parseLine(lines[i], i + 1, ctx); }
+      catch(e){ res = { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + (i+1) }; }
+      if(!res.ok){ errorInfo = res; break; }
+    }
+    return { text: ctx.output, error: errorInfo };
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderOutput(outputEl, result){
+    var html = '';
+    if(result.text){ html += escapeHtml(result.text); }
+    if(result.error){
+      html += '<span class="error-line">' + escapeHtml(result.error.error) + '</span>';
+      if(result.error.note){ html += '<span class="error-note">' + escapeHtml(result.error.note) + '</span>'; }
+    }
+    outputEl.innerHTML = html || '<span class="placeholder">(no output)</span>';
+  }
+
+  function detectInputPrompts(code){
+    var re = /input\s*\(([^)]*)\)/g;
+    var prompts = [], m;
+    while((m = re.exec(code))){
+      var inner = m[1].trim();
+      var prompt = '';
+      if(inner){
+        var parsed = parseStringLiteral(inner);
+        if(parsed && parsed.rest.trim() === '') prompt = parsed.raw;
+      }
+      prompts.push(prompt);
+    }
+    return prompts;
+  }
+
+  function refreshInputFields(pg){
+    var textarea = pg.querySelector('.pg-input');
+    var panel = pg.querySelector('.pg-inputs-panel');
+    if(!textarea || !panel) return;
+    var fixedInputsAttr = pg.getAttribute('data-fixed-inputs');
+    if(fixedInputsAttr){
+      panel.style.display = 'none';
+      panel.innerHTML = '';
+      return;
+    }
+    var prompts = detectInputPrompts(textarea.value);
+    var oldValues = Array.prototype.map.call(panel.querySelectorAll('input'), function(inp){ return inp.value; });
+    panel.innerHTML = '';
+    if(prompts.length === 0){ panel.style.display = 'none'; return; }
+    panel.style.display = 'flex';
+    prompts.forEach(function(p, idx){
+      var row = document.createElement('div');
+      row.className = 'input-row';
+      var label = document.createElement('label');
+      label.textContent = 'Simulated input ' + (idx + 1) + (p ? ' (' + p.trim() + ')' : '') + ':';
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.value = oldValues[idx] !== undefined ? oldValues[idx] : '';
+      inp.placeholder = 'type a value…';
+      row.appendChild(label);
+      row.appendChild(inp);
+      panel.appendChild(row);
+    });
+  }
+
+  function getInputValues(pg){
+    var fixedInputsAttr = pg.getAttribute('data-fixed-inputs');
+    if(fixedInputsAttr){
+      try{ return JSON.parse(fixedInputsAttr); }catch(e){ return []; }
+    }
+    var panel = pg.querySelector('.pg-inputs-panel');
+    if(!panel) return [];
+    return Array.prototype.map.call(panel.querySelectorAll('input'), function(inp){ return inp.value; });
+  }
+
+  document.querySelectorAll('.playground').forEach(function(pg){
+    var textarea = pg.querySelector('.pg-input');
+    if(!textarea) return;
+    refreshInputFields(pg);
+    textarea.addEventListener('input', function(){ refreshInputFields(pg); });
+  });
+
+  document.querySelectorAll('.playground').forEach(function(pg){
+    var textarea = pg.querySelector('.pg-input');
+    var runBtn = pg.querySelector('.pg-run');
+    var output = pg.querySelector('.pg-output');
+    if(!textarea || !runBtn || !output) return;
+    runBtn.addEventListener('click', function(){
+      renderOutput(output, runCode(textarea.value, getInputValues(pg)));
+    });
+  });
+
+  document.querySelectorAll('.pg-check').forEach(function(btn){
+    var pg = btn.closest('.playground');
+    if(!pg) return;
+    var textarea = pg.querySelector('.pg-input');
+    var output = pg.querySelector('.pg-output');
+    var banner = pg.querySelector('.result-banner');
+    var expected = pg.getAttribute('data-expected') || '';
+
+    btn.addEventListener('click', function(){
+      var result = runCode(textarea.value, getInputValues(pg));
+      renderOutput(output, result);
+      if(!banner) return;
+      banner.classList.remove('hidden', 'pass', 'fail');
+      if(result.error){
+        banner.classList.add('fail');
+        banner.textContent = '❌ There\'s an error above — fix it and check again.';
+        return;
+      }
+      var actual = (result.text || '').replace(/\n+$/, '');
+      var exp = expected.replace(/\n+$/, '');
+      if(actual === exp){
+        banner.classList.add('pass');
+        banner.textContent = '✅ Matches the target output — nicely done!';
+      } else {
+        banner.classList.add('fail');
+        banner.textContent = '❌ Not quite yet — compare your output above with the target.';
+      }
+    });
+  });
+
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    var originalLabel = btn.textContent;
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-target');
+      var target = document.getElementById(targetId);
+      if(!target) return;
+      var nowShowing = target.classList.toggle('show');
+      btn.textContent = nowShowing ? 'Hide' : originalLabel;
+    });
+  });
+
+  document.querySelectorAll('.yesno-card').forEach(function(card){
+    var correctAnswer = card.getAttribute('data-answer');
+    var buttons = card.querySelectorAll('.yesno-btn');
+    var panel = card.querySelector('.answer-panel');
+    var verdictEl = panel ? panel.querySelector('.verdict') : null;
+
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var choice = btn.getAttribute('data-choice');
+        var isCorrect = (choice === correctAnswer);
+
+        buttons.forEach(function(b){ b.classList.remove('chosen', 'correct', 'incorrect', 'reveal-correct'); });
+        btn.classList.add('chosen', isCorrect ? 'correct' : 'incorrect');
+        if(!isCorrect){
+          buttons.forEach(function(b){
+            if(b.getAttribute('data-choice') === correctAnswer) b.classList.add('reveal-correct');
+          });
+        }
+
+        if(panel) panel.classList.add('show');
+        if(verdictEl){
+          verdictEl.textContent = isCorrect ? '✅ Correct!' : '❌ Not quite!';
+          verdictEl.className = 'verdict ' + (isCorrect ? 'correct' : 'incorrect');
+        }
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
