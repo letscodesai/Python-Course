@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 · Relational &amp; Logical Operators — Python Notes</title>
+<meta name="description" content="Comparing values with ==, !=, <, >, <=, >=, comparing strings and across types, combining conditions with and, or, not, operator precedence, and short-circuit evaluation.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Lora:ital,wght@0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper: #F5F7F1; --paper-dim: #E9EEE3; --ink: #1B2430; --ink-soft: #4B5768; --ink-faint: #7C879A;
+    --amber: #F2B705; --amber-ink: #4A3A00; --amber-soft: rgba(242,183,5,0.16);
+    --teal: #1F958A; --teal-soft: #E4F5F3; --coral: #E75C4B; --coral-soft: #FDE9E6;
+    --card: #FFFFFF; --line: #DDE3D6;
+    --display: "Space Grotesk", sans-serif; --body: "Lora", Georgia, serif; --mono: "JetBrains Mono", "Courier New", monospace;
+    --maxw: 880px; --radius: 16px;
+  }
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{ margin:0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  ::selection{ background: var(--amber); color: var(--ink); }
+  a{ color: var(--teal); }
+  :focus-visible{ outline: 3px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+  h1, h2, h3, h4{ font-family: var(--display); line-height: 1.15; letter-spacing: -0.01em; margin: 0; }
+  p{ margin: 0 0 1em 0; }
+  code{ font-family: var(--mono); background: var(--paper-dim); padding: 2px 6px; border-radius: 5px; font-size: 0.9em; }
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .progress-track{ position: fixed; top:0; left:0; right:0; height:4px; background: var(--paper-dim); z-index:100; }
+  .progress-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--teal), var(--amber)); transition: width 0.08s linear; }
+
+  .topbar{ max-width: var(--maxw); margin: 0 auto; padding: 22px 24px 0 24px; display:flex; align-items:center; justify-content:space-between; font-family: var(--display); }
+  .topbar .brand{ font-weight:700; font-size:15px; letter-spacing:0.02em; display:flex; align-items:center; gap:8px; }
+  .topbar .brand .dot{ width:9px; height:9px; border-radius:50%; background: var(--amber); box-shadow: 0 0 0 4px var(--teal-soft); }
+
+  .hero{ max-width: var(--maxw); margin:0 auto; padding: 56px 24px 40px 24px; }
+  .hero .eyebrow{ font-family: var(--mono); font-size:13px; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:14px; }
+  .hero h1{ font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight:700; margin-bottom:18px; }
+  .hero h1 .accent{ color: var(--teal); }
+  .hero .lede{ font-size: 1.15rem; color: var(--ink-soft); max-width: 62ch; margin-bottom: 10px; }
+
+  .darkbox{ background: var(--ink); border-radius: var(--radius); overflow:hidden; box-shadow: 0 18px 40px -18px rgba(27,36,48,0.4); margin: 20px 0; }
+  .darkbox-chrome{ display:flex; align-items:center; gap:8px; padding: 12px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .darkbox-chrome span{ width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .darkbox-chrome span:nth-child(1){ background:#E75C4B; }
+  .darkbox-chrome span:nth-child(2){ background:#F2B705; }
+  .darkbox-chrome span:nth-child(3){ background:#1F958A; }
+  .darkbox-title{ margin-left:8px; font-family: var(--mono); font-size:12px; color: rgba(255,255,255,0.5); }
+
+  .run-btn{ font-family: var(--display); font-weight:600; font-size:13.5px; background: var(--amber); color: var(--amber-ink); border:none; padding:11px 18px; border-radius:8px; cursor:pointer; transition: transform 0.12s ease; white-space: nowrap; }
+  .run-btn:hover{ transform: translateY(-1px); }
+  .run-btn.check-btn{ background: var(--teal); color:#fff; }
+
+  .playground{ margin-bottom: 20px; }
+  .playground textarea{
+    width:100%; box-sizing:border-box; display:block; background: rgba(255,255,255,0.03); border:none; resize:vertical;
+    color:#E7ECE4; font-family: var(--mono); font-size:13.5px; line-height:1.7; padding: 16px 18px; min-height: 74px; outline:none;
+  }
+  .playground-actions{ display:flex; align-items:center; gap:10px; padding: 10px 18px; border-top:1px solid rgba(255,255,255,0.08); border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
+  .playground-hint{ font-family: var(--mono); font-size:11.5px; color: rgba(231,236,228,0.45); }
+  .playground-output-label{ padding: 10px 18px 0 18px; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color: rgba(231,236,228,0.4); }
+  .playground-output{ padding: 10px 18px 18px 18px; font-family: var(--mono); font-size:13.5px; color:#E7ECE4; white-space: pre-wrap; word-break: break-word; min-height: 40px; }
+  .playground-output .placeholder{ color: rgba(231,236,228,0.35); }
+  .playground-output .error-line{ color:#FF9086; display:block; margin-top:8px; font-weight:600; }
+  .playground-output .error-note{ color: rgba(255,144,134,0.75); display:block; font-weight:400; font-size:12px; margin-top:4px; }
+
+  .pg-inputs-panel{ padding: 12px 18px; border-top:1px solid rgba(255,255,255,0.08); display:none; flex-direction:column; gap:8px; background: rgba(255,255,255,0.02); }
+  .pg-inputs-panel .input-row{ display:flex; align-items:center; gap:10px; }
+  .pg-inputs-panel label{ font-family: var(--mono); font-size:11.5px; color: rgba(231,236,228,0.55); white-space:nowrap; flex-shrink:0; }
+  .pg-inputs-panel input{ flex:1; background: rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.16); color:#F5F7F1; font-family: var(--mono); font-size:13px; padding:7px 10px; border-radius:6px; min-width:0; }
+  .pg-inputs-panel input::placeholder{ color: rgba(245,247,241,0.35); }
+
+  .result-banner{ margin: 0 18px 16px 18px; padding:11px 15px; border-radius:10px; font-family: var(--display); font-weight:600; font-size:13px; }
+  .result-banner.hidden{ display:none; }
+  .result-banner.pass{ background: rgba(31,149,138,0.18); color: #9CE8DC; }
+  .result-banner.fail{ background: rgba(231,92,75,0.18); color: #FFB4A8; }
+
+  .lesson{ padding: 56px 0; border-top: 1px solid var(--line); }
+  .lesson.alt{ background: var(--paper-dim); }
+  .lesson-head{ display:flex; gap:20px; align-items:baseline; margin-bottom:22px; }
+  .lesson-num{ font-family: var(--display); font-weight:700; font-size:15px; color: var(--teal); background: var(--teal-soft); border-radius:999px; width:40px; height:40px; min-width:40px; display:flex; align-items:center; justify-content:center; }
+  .lesson-head h2{ font-size: clamp(1.35rem, 3.1vw, 1.85rem); }
+  .lesson-intro{ color: var(--ink-soft); max-width: 68ch; font-size: 1.02rem; margin-bottom: 20px; }
+
+  .split-2{ display:grid; grid-template-columns: 1fr 1fr; gap:22px; align-items:start; margin: 18px 0; }
+  .split-2 p{ font-size: 0.98rem; }
+
+  .term-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
+  .term-grid.compact{ grid-template-columns: repeat(3, 1fr); }
+  .term-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+  .term-card h3{ font-size: 1rem; margin-bottom:5px; font-family: var(--mono); }
+  .term-card p{ font-size: 0.87rem; color: var(--ink-soft); margin-bottom:0; }
+
+  .callout{ margin: 18px 0; background: var(--coral-soft); border:1px solid rgba(231,92,75,0.25); border-radius: var(--radius); padding:16px 20px; display:flex; gap:14px; align-items:flex-start; }
+  .callout .icon{ width:24px; height:24px; min-width:24px; color: var(--coral); margin-top:2px; }
+  .callout p{ margin:0; color: var(--ink); font-size:0.95rem; }
+  .callout strong{ font-family: var(--display); }
+  .callout.teal{ background: var(--teal-soft); border-color: rgba(31,149,138,0.25); }
+  .callout.teal .icon{ color: var(--teal); }
+  .callout.amber{ background: var(--amber-soft); border-color: rgba(242,183,5,0.35); }
+  .callout.amber .icon{ color: var(--amber-ink); }
+
+  .code-compare{ display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin: 18px 0; }
+  .code-card{ background: var(--ink); border-radius: var(--radius); overflow:hidden; }
+  .code-card .code-head{ display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background: rgba(255,255,255,0.04); font-family: var(--display); font-size:12.5px; font-weight:600; color:#E7ECE4; }
+  .code-card pre{ margin:0; padding:14px 14px 16px 14px; font-family: var(--mono); font-size:13px; color:#DCE7DC; overflow-x:auto; line-height:1.6; }
+  .code-card .out{ background: rgba(255,255,255,0.03); border-top:1px solid rgba(255,255,255,0.07); padding: 10px 14px; font-family: var(--mono); font-size:12.5px; color:#B9EAC0; white-space:pre-wrap; }
+  .code-card .out .lab{ color: rgba(231,236,228,0.4); font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:4px; }
+
+  .predict-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:20px; }
+  .predict-card .q{ font-family: var(--display); font-weight:600; font-size:0.92rem; margin-bottom:10px; color: var(--ink-soft); }
+  .predict-card pre{ background: var(--ink); color:#DCE7DC; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:12.5px; overflow-x:auto; margin:0 0 12px 0; }
+  .reveal-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--teal-soft); color: var(--teal); border:none; padding:9px 18px; border-radius:999px; cursor:pointer; }
+  .reveal-btn:hover{ filter: brightness(0.95); }
+
+  .yesno-row{ display:flex; gap:10px; }
+  .yesno-btn{ font-family: var(--display); font-weight:600; font-size:13px; background: var(--paper-dim); color: var(--ink); border:1px solid var(--line); padding:9px 22px; border-radius:999px; cursor:pointer; transition: all 0.15s ease; }
+  .yesno-btn:hover{ border-color: var(--teal); }
+  .yesno-btn.chosen.correct{ background: var(--teal); color:#fff; border-color: var(--teal); }
+  .yesno-btn.chosen.incorrect{ background: var(--coral); color:#fff; border-color: var(--coral); }
+  .yesno-btn.reveal-correct{ border-color: var(--teal); color: var(--teal); font-weight:700; }
+  .verdict{ font-family: var(--display); font-weight:700; font-size:0.92rem; margin-bottom:10px; }
+  .verdict.correct{ color: var(--teal); }
+  .verdict.incorrect{ color: var(--coral); }
+
+  .answer-panel{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); display:none; }
+  .answer-panel.show{ display:block; }
+  .answer-panel .out-label{ font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .answer-panel pre{ background:#12261F; color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0 0 10px 0; white-space:pre-wrap; }
+  .answer-panel .explain{ font-size:0.9rem; color: var(--ink-soft); margin-bottom:0; }
+
+  .debug-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:22px; margin-top: 18px; }
+  .debug-card .tag{ display:inline-block; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--coral); background: var(--coral-soft); padding:3px 10px; border-radius:6px; margin-bottom:12px; }
+
+  .challenge-split{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap:22px; align-items:start; margin: 18px 0; }
+  .challenge-info h4{ font-size:1rem; margin-bottom:10px; }
+  .challenge-info p{ font-size:0.94rem; color: var(--ink-soft); }
+  .target-box{ margin-top:14px; }
+  .target-box .target-label{ display:block; font-family: var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); margin-bottom:6px; }
+  .target-box pre{ background: var(--ink); color:#B9EAC0; padding:12px 14px; border-radius:10px; font-family: var(--mono); font-size:13px; margin:0; white-space:pre-wrap; }
+
+  /* ---- truth tables ---- */
+  .truth-table{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1px; background: var(--line); border:1px solid var(--line); border-radius: 12px; overflow:hidden; font-family: var(--mono); font-size:14px; }
+  .truth-table.unary{ grid-template-columns: repeat(2, 1fr); max-width: 320px; }
+  .truth-table > div{ background: var(--card); padding:10px 14px; }
+  .truth-table > div.hd{ background: var(--paper-dim); font-weight:700; font-size:12px; color: var(--ink-soft); font-family: var(--display); }
+  .truth-table .t-true{ color: var(--teal); font-weight:700; }
+  .truth-table .t-false{ color: var(--coral); font-weight:700; }
+  .truth-wrap h4{ font-family: var(--display); font-size:0.95rem; margin-bottom:10px; }
+
+  /* ---- precedence ladder ---- */
+  .prec-list{ display:flex; flex-direction:column; gap:8px; margin: 18px 0; }
+  .prec-list .row{ display:grid; grid-template-columns: 30px 1fr auto; gap:14px; align-items:center; background: var(--card); border:1px solid var(--line); border-radius: 10px; padding: 11px 16px; }
+  .prec-list .row .n{ font-family: var(--mono); color: var(--ink-faint); font-size:12px; text-align:center; }
+  .prec-list .row .nm{ font-family: var(--display); font-weight:700; font-size:14px; }
+  .prec-list .row .ops{ font-family: var(--mono); font-size:13px; color: var(--ink-soft); text-align:right; }
+  .prec-list .row.tight{ border-color: var(--teal); background: var(--teal-soft); }
+  .prec-list .row.loose{ border-color: var(--amber); background: var(--amber-soft); }
+
+  /* ---- match-card (new click-to-match exercise) ---- */
+  .match-card{ background: var(--card); border:1px solid var(--line); border-radius: var(--radius); padding:24px; }
+  .match-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:18px; flex-wrap:wrap; gap:8px; }
+  .match-title{ font-family: var(--display); font-weight:700; font-size:0.95rem; }
+  .match-sub{ font-size:0.88rem; color: var(--ink-soft); margin: -10px 0 18px; }
+  .match-progress{ font-family: var(--mono); font-size:12px; color: var(--ink-soft); background: var(--paper-dim); border-radius:999px; padding:5px 13px; }
+  .match-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px 20px; }
+  .match-col{ display:flex; flex-direction:column; gap:10px; }
+  .match-pill{ font-family: var(--mono); font-size:14px; padding:12px 14px; border-radius:10px; border:1.5px solid var(--line); background: var(--paper); cursor:pointer; text-align:left; transition: all 0.15s ease; min-height:46px; display:flex; align-items:center; color: var(--ink); }
+  .match-col.right .match-pill{ font-family: var(--body); font-size:14px; }
+  .match-pill:hover:not(.matched):not(.selected){ border-color: var(--teal); background: var(--teal-soft); }
+  .match-pill.selected{ border-color: var(--teal); background: var(--teal); color:#fff; box-shadow: 0 0 0 3px var(--teal-soft); }
+  .match-pill.matched{ background: var(--teal-soft); border-color: var(--teal); color: var(--teal); cursor:default; opacity:0.78; }
+  .match-pill.wrong{ background: var(--coral-soft); border-color: var(--coral); color: var(--coral); animation: match-shake 0.32s ease; }
+  @keyframes match-shake{ 0%,100%{ transform: translateX(0); } 25%{ transform: translateX(-4px); } 75%{ transform: translateX(4px); } }
+  .match-done{ margin-top:18px; padding:13px 16px; background: var(--teal-soft); border:1px solid var(--teal); border-radius:10px; color:#0E5950; font-family: var(--display); font-weight:700; font-size:14px; display:none; }
+  .match-done.shown{ display:block; }
+  @media (prefers-reduced-motion: reduce){ .match-pill.wrong{ animation:none; } }
+
+  footer{ padding: 46px 0 70px 0; text-align:center; }
+  footer .wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  footer .brand{ font-family: var(--display); font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px; }
+  footer .brand .dot{ width:8px; height:8px; border-radius:50%; background: var(--amber); }
+  footer p{ margin:0; color: var(--ink-faint); font-size:13.5px; }
+
+  @media (max-width: 760px){
+    .term-grid, .code-compare, .split-2, .challenge-split, .match-grid, .truth-table{ grid-template-columns: 1fr; }
+    .truth-table{ grid-template-columns: repeat(3, 1fr); }
+    .term-grid.compact{ grid-template-columns: repeat(2, 1fr); }
+    body{ font-size:17px; }
+    .lesson{ padding: 44px 0; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Python Notes</div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="eyebrow">Chapter 7: Relational &amp; Logical Operators</div>
+  <h1>Your programs are about<br>to start <span class="accent">making decisions.</span></h1>
+  <p class="lede">Everything so far has calculated and displayed things. Now your code starts asking true-or-false questions — comparing values, and combining those comparisons into bigger conditions.</p>
+</header>
+
+<main>
+
+<!-- ============ 01 RELATIONAL OPERATORS ============ -->
+<section class="lesson" id="relational">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">01</div><h2>Relational Operators: Asking True-or-False Questions</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> a relational operator compares two values and produces a <code>bool</code> — either <code>True</code> or <code>False</code>. It never changes either value; it only reports a fact about the relationship between them.</p>
+
+    <div class="term-grid compact">
+      <div class="term-card"><h3>==</h3><p>equal to</p></div>
+      <div class="term-card"><h3>!=</h3><p>not equal to</p></div>
+      <div class="term-card"><h3>&gt;</h3><p>greater than</p></div>
+      <div class="term-card"><h3>&lt;</h3><p>less than</p></div>
+      <div class="term-card"><h3>&gt;=</h3><p>greater than or equal to</p></div>
+      <div class="term-card"><h3>&lt;=</h3><p>less than or equal to</p></div>
+    </div>
+
+    <div class="predict-card" style="margin-top:20px;">
+      <div class="q">Predict the output</div>
+      <pre>print(5 &gt; 3)
+print(5 == 5)
+print(2 &gt;= 9)</pre>
+      <button class="reveal-btn" data-target="ansRelational">Reveal output</button>
+      <div class="answer-panel" id="ansRelational">
+        <div class="out-label">Output</div>
+        <pre>True
+True
+False</pre>
+        <p class="explain">Each line resolves to exactly one of two values, <code>True</code> or <code>False</code> — there's no in-between answer to a relational comparison.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 VARIABLES AND EXPRESSIONS ============ -->
+<section class="lesson alt" id="comparing-expressions">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">02</div><h2>Comparing More Than Literal Numbers</h2></div>
+    <p class="lesson-intro">Either side of a relational operator can be a variable, or a whole expression — Python works out both sides first, then compares the results.</p>
+
+    <div class="playground" id="pgVarsExpr">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">playground.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="5">price = 42
+budget = 50
+print(price &lt;= budget)
+print((3 + 2) == 5)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">try changing price and budget</span>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+    <p style="font-size:0.98rem;">Python evaluates <code>price &lt;= budget</code> by looking up both variables first, then comparing the two numbers it finds — exactly as if you'd written <code>42 &lt;= 50</code>. The same happens with <code>(3 + 2) == 5</code>: the parentheses resolve first, leaving <code>5 == 5</code>.</p>
+  </div>
+</section>
+
+<!-- ============ 03 COMPARING STRINGS ============ -->
+<section class="lesson" id="comparing-strings">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">03</div><h2>Comparing Text</h2></div>
+    <p class="lesson-intro">Strings can be compared too — but the rules differ from numbers in a few important ways.</p>
+
+    <div class="code-compare">
+      <div class="code-card">
+        <div class="code-head"><span>Case-sensitive equality</span></div>
+        <pre>&gt;&gt;&gt; "cat" == "cat"
+True
+&gt;&gt;&gt; "cat" == "Cat"
+False</pre>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><span>Different types, never equal</span></div>
+        <pre>&gt;&gt;&gt; 123 == "123"
+False
+&gt;&gt;&gt; 12 == 12.0
+True</pre>
+      </div>
+    </div>
+
+    <p style="font-size:0.98rem;"><strong>Rule:</strong> numbers compare equal across <code>int</code> and <code>float</code> because they're both numbers underneath — <code>12</code> and <code>12.0</code> are the same value. A string is never the same value as a number, no matter what digits it contains.</p>
+
+    <h3 style="font-size:1.1rem; margin:30px 0 8px;">Ordering strings: lexicographic comparison</h3>
+    <p style="font-size:0.98rem;"><code>&lt;</code> and <code>&gt;</code> work on strings too. Python compares them character by character, left to right, using each character's underlying code — the same way a dictionary orders words, which is why this is called <strong>lexicographic</strong> order.</p>
+
+    <div class="predict-card yesno-card" data-answer="yes" style="margin-top:16px;">
+      <div class="q">"apple" &lt; "banana"</div>
+      <div class="yesno-row">
+        <button class="yesno-btn" data-choice="yes">True</button>
+        <button class="yesno-btn" data-choice="no">False</button>
+      </div>
+      <div class="answer-panel" id="ansStrOrder1">
+        <div class="verdict"></div>
+        <p class="explain"><code>"a"</code> comes before <code>"b"</code> in character order, so the comparison stops right there and decides the whole string.</p>
+      </div>
+    </div>
+
+    <div class="predict-card yesno-card" data-answer="yes" style="margin-top:16px;">
+      <div class="q">"Zebra" &lt; "apple"</div>
+      <div class="yesno-row">
+        <button class="yesno-btn" data-choice="yes">True</button>
+        <button class="yesno-btn" data-choice="no">False</button>
+      </div>
+      <div class="answer-panel" id="ansStrOrder2">
+        <div class="verdict"></div>
+        <p class="explain">This one surprises most people — capital letters sit <em>before</em> lowercase letters in character order, so every capitalized word sorts before every lowercase word, regardless of the letters that follow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 COMMON MISTAKES ============ -->
+<section class="lesson alt" id="mistakes">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">04</div><h2>Two Common Mistakes</h2></div>
+    <p class="lesson-intro">These trip up almost everyone the first time.</p>
+
+    <div class="debug-card">
+      <span class="tag">Debug this</span>
+      <p style="font-size:0.92rem; color:var(--ink-soft);">This code is supposed to check whether <code>score</code> reached <code>100</code> — without changing it. A single typed character turns the check into something else entirely.</p>
+      <div class="target-box"><span class="target-label">Target output</span><pre>False</pre></div>
+
+      <div class="playground darkbox" id="pgMistakeAssign" style="margin:14px 0 0 0;" data-expected="False">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">broken.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="3">score = 90
+score = 100
+print(score)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+
+    <p style="font-size:0.98rem; margin-top:18px;"><strong>Rule:</strong> a single <code>=</code> always stores a value in a variable — it never asks a question. Here the second line doesn't compare <code>score</code> to <code>100</code>, it silently overwrites it, so the original <code>90</code> is gone. Python won't catch this for you: <code>=</code> and <code>==</code> are both valid, just very different operators. Fix it by comparing with <code>==</code> instead: <code>score = 90</code> then <code>print(score == 100)</code> — which leaves <code>score</code> untouched and correctly prints <code>False</code>.</p>
+
+    <div class="callout amber" style="margin-top:22px;">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v5M12 15.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p><strong>Spacing matters too:</strong> <code>&lt;=</code> is one operator, written with no space. <code>&lt; =</code>, with a space between the two characters, is not the same thing — Python sees two unexpected symbols and raises a <code>SyntaxError</code>.</p>
+    </div>
+
+    <div class="predict-card" style="margin-top:18px;">
+      <div class="q">Predict the output</div>
+      <pre>print(5 &lt; = 5)</pre>
+      <button class="reveal-btn" data-target="ansSpacing">Reveal output</button>
+      <div class="answer-panel" id="ansSpacing">
+        <div class="out-label">Output</div>
+        <pre>SyntaxError: invalid syntax</pre>
+        <p class="explain">There's no operator spelled <code>&lt;</code> space <code>=</code> — Python needs them written together, with nothing in between.</p>
+      </div>
+    </div>
+
+    <p style="font-size:0.98rem; margin-top:22px;">One more: Python won't order-compare values that don't share a meaningful scale. <code>&lt;</code> and <code>&gt;</code> work between two numbers, or between two strings — but mixing a string with a number raises a <code>TypeError</code>, because there's no sensible answer to "is the word <code>'abc'</code> less than the number <code>5</code>?"</p>
+
+    <div class="playground" id="pgTypeMismatch">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">playground.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="2">print('abc' &lt; 5)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 LOGICAL OPERATORS ============ -->
+<section class="lesson" id="logical">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">05</div><h2>Logical operators: and, or, not</h2></div>
+    <p class="lesson-intro"><strong>Definition:</strong> a logical operator combines <code>bool</code> values — often the results of comparisons — into a single true-or-false answer.</p>
+
+    <div class="split-2">
+      <div class="truth-wrap">
+        <h4><code>and</code> — both must be true</h4>
+        <div class="truth-table">
+          <div class="hd">A</div><div class="hd">B</div><div class="hd">A and B</div>
+          <div>True</div><div>True</div><div class="t-true">True</div>
+          <div>True</div><div>False</div><div class="t-false">False</div>
+          <div>False</div><div>True</div><div class="t-false">False</div>
+          <div>False</div><div>False</div><div class="t-false">False</div>
+        </div>
+      </div>
+      <div class="truth-wrap">
+        <h4><code>or</code> — at least one must be true</h4>
+        <div class="truth-table">
+          <div class="hd">A</div><div class="hd">B</div><div class="hd">A or B</div>
+          <div>True</div><div>True</div><div class="t-true">True</div>
+          <div>True</div><div>False</div><div class="t-true">True</div>
+          <div>False</div><div>True</div><div class="t-true">True</div>
+          <div>False</div><div>False</div><div class="t-false">False</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="truth-wrap" style="margin-top:18px;">
+      <h4><code>not</code> — flips it</h4>
+      <div class="truth-table unary">
+        <div class="hd">A</div><div class="hd">not A</div>
+        <div>True</div><div class="t-false">False</div>
+        <div>False</div><div class="t-true">True</div>
+      </div>
+    </div>
+
+    <div class="playground" id="pgLogical" style="margin-top:22px;">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">playground.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="4">age = 20
+has_ticket = True
+print(age &gt;= 18 and has_ticket)
+print(not has_ticket)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 COMBINING RELATIONAL + LOGICAL ============ -->
+<section class="lesson alt" id="combining">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">06</div><h2>Relational and Logical, Together</h2></div>
+    <p class="lesson-intro">The real power shows up when a comparison becomes one side of a logical operator.</p>
+
+    <div class="predict-card">
+      <div class="q">Predict the output</div>
+      <pre>print((2 &lt; 3) and (1 &lt; 2))
+print((10 &gt; 5) and (10 &lt; 20))
+print((7 == 7) or (4 != 4))
+print((5 &gt;= 5) and (3 &lt; 2))</pre>
+      <button class="reveal-btn" data-target="ansCombining">Reveal output</button>
+      <div class="answer-panel" id="ansCombining">
+        <div class="out-label">Output</div>
+        <pre>True
+True
+True
+False</pre>
+        <p class="explain">Each pair of parentheses resolves to a <code>bool</code> first — Python then combines those two <code>bool</code> values with <code>and</code> or <code>or</code>, exactly as the truth tables describe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 PRECEDENCE ============ -->
+<section class="lesson" id="precedence">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">07</div><h2>What Happens First: Operator Precedence</h2></div>
+    <p class="lesson-intro">Without parentheses, Python still has to pick an order. Arithmetic happens before comparisons, and among the logical operators, <code>not</code> binds tightest, then <code>and</code>, then <code>or</code> loosest.</p>
+
+    <div class="prec-list">
+      <div class="row tight"><div class="n">1</div><div class="nm">Arithmetic</div><div class="ops">+  -  *  /  //  %  **</div></div>
+      <div class="row"><div class="n">2</div><div class="nm">Comparisons</div><div class="ops">==  !=  &lt;  &gt;  &lt;=  &gt;=</div></div>
+      <div class="row"><div class="n">3</div><div class="nm">not</div><div class="ops">not x</div></div>
+      <div class="row"><div class="n">4</div><div class="nm">and</div><div class="ops">x and y</div></div>
+      <div class="row loose"><div class="n">5</div><div class="nm">or</div><div class="ops">x or y</div></div>
+    </div>
+    <p style="font-size:0.98rem;">Read that as: Python finishes all the math first, then all the comparisons, then applies <code>not</code>, then <code>and</code>, and settles <code>or</code> last.</p>
+
+    <div class="playground" id="pgPrecedence">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">playground.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="3">print(not True and False)
+print(2 + 3 &gt; 4 and 1 &lt; 2)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+    <p style="font-size:0.98rem;">In the first line, <code>not True</code> resolves to <code>False</code> before <code>and</code> ever runs, leaving <code>False and False</code>. In the second, <code>2 + 3 &gt; 4</code> becomes <code>5 &gt; 4</code> before it's combined with <code>1 &lt; 2</code> using <code>and</code>. When precedence alone feels risky to rely on, parentheses make the order explicit and are never wrong to add.</p>
+  </div>
+</section>
+
+<!-- ============ 08 SHORT-CIRCUIT EVALUATION ============ -->
+<section class="lesson alt" id="shortcircuit">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">08</div><h2>Short-Circuit Evaluation</h2></div>
+    <p class="lesson-intro">Python is lazy in a useful way: once <code>and</code> or <code>or</code> already knows the answer from the left side, it doesn't bother checking the right side at all.</p>
+
+    <div class="split-2">
+      <div class="term-card">
+        <h3 style="font-family:var(--display); font-size:1rem;"><code>and</code> stops at the first False</h3>
+        <p style="font-size:0.92rem;">If the left side of <code>and</code> is <code>False</code>, the whole expression must be <code>False</code> no matter what the right side is — so Python never looks at it.</p>
+      </div>
+      <div class="term-card">
+        <h3 style="font-family:var(--display); font-size:1rem;"><code>or</code> stops at the first True</h3>
+        <p style="font-size:0.92rem;">If the left side of <code>or</code> is <code>True</code>, the whole expression must be <code>True</code> already — so the right side is skipped.</p>
+      </div>
+    </div>
+
+    <p style="font-size:0.98rem; margin-top:18px;">Here's proof you can run yourself. Type anything into the simulated input box below, then run the code — and watch what makes it into the output.</p>
+
+    <div class="playground" id="pgShortCircuit1">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">short_circuit.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="1">print(False and input("Type anything: "))</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">fill in the simulated input, then run</span>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+    <p style="font-size:0.95rem; color:var(--ink-soft);">Whatever you typed never shows up in the output. The left side, <code>False</code>, already settles the <code>and</code> — so <code>input("Type anything: ")</code> on the right never actually runs.</p>
+
+    <div class="playground" id="pgShortCircuit2" style="margin-top:22px;">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">short_circuit.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="1">print(True or input("Type anything: "))</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <span class="playground-hint">fill in the simulated input, then run</span>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+    <p style="font-size:0.95rem; color:var(--ink-soft);">Same story in reverse — <code>True</code> already settles the <code>or</code>, so the right side is skipped again.</p>
+
+    <div class="callout teal" style="margin-top:20px;">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p><strong>Rule:</strong> short-circuiting isn't just an optimization — it means the right side of <code>and</code>/<code>or</code> may not run at all, which matters if that side has an effect like <code>input(...)</code> or <code>print(...)</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 NON-BOOLEAN RETURN (brief note) ============ -->
+<section class="lesson" id="nonbool">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">09</div><h2>A Brief Note: and / or Don't Always Return a Bool</h2></div>
+    <p class="lesson-intro">Worth knowing, not worth dwelling on — <code>and</code> and <code>or</code> actually hand back whichever side's value decided the result, not always <code>True</code>/<code>False</code>.</p>
+
+    <div class="playground" id="pgNonBool">
+      <div class="darkbox" style="margin:0;">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">playground.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="2">print("" or "default")
+print(3 and 5)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run to see the output…</span></div>
+      </div>
+    </div>
+    <p style="font-size:0.98rem;">An empty string is falsy, so <code>"" or "default"</code> moves on to the right side and returns <code>"default"</code> itself — not <code>True</code>. Keep this in the back of your mind for now; it matters more once you're working with more types of values.</p>
+  </div>
+</section>
+
+<!-- ============ 10 PRACTICE ============ -->
+<section class="lesson alt" id="practice">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">10</div><h2>Practice</h2></div>
+    <p class="lesson-intro">Three exercises, three different formats.</p>
+
+    <div class="match-card" data-match>
+      <div class="match-head">
+        <div class="match-title">Match the operator to its meaning</div>
+        <div class="match-progress"><span class="m-done">0</span> of <span class="m-total">6</span> matched</div>
+      </div>
+      <p class="match-sub">Click one pill on the left, then its match on the right.</p>
+      <div class="match-grid">
+        <div class="match-col left"></div>
+        <div class="match-col right"></div>
+      </div>
+      <div class="match-done">All matched — nice work.</div>
+    </div>
+
+    <h3 style="font-size:1.1rem; margin:34px 0 10px;">Fix the precedence bug</h3>
+    <div class="debug-card" style="margin-top:0;">
+      <span class="tag">Debug this</span>
+      <p style="font-size:0.92rem; color:var(--ink-soft);">This gate is meant to admit someone only if they're an adult <em>and</em> have a ticket. The 16-year-old below has a ticket but isn't old enough — yet the code admits them anyway.</p>
+      <div class="target-box"><span class="target-label">Target output</span><pre>False</pre></div>
+
+      <div class="playground darkbox" id="pgEntryGate" style="margin:14px 0 0 0;" data-expected="False">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">entry.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="3">age = 16
+has_ticket = True
+print(has_ticket and has_ticket or age &gt;= 18)</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+      <p style="font-size:0.92rem; color:var(--ink-soft); margin-top:14px;">Because <code>and</code> binds tighter than <code>or</code>, the broken line is really <code>(has_ticket and has_ticket) or (age &gt;= 18)</code> — having a ticket alone already satisfies the <code>or</code>, so the age check never gets a say. Fix it with a single <code>and</code>: <code>age &gt;= 18 and has_ticket</code>.</p>
+    </div>
+
+    <h3 style="font-size:1.1rem; margin:34px 0 10px;">Build it yourself</h3>
+    <div class="challenge-split">
+      <div class="challenge-info">
+        <h4>🎯 Weather check</h4>
+        <p>Two variables are given: <code>temp = 71</code> and <code>is_raining = False</code>. Write two lines: first, print whether the temperature is between 60 and 80 inclusive <em>and</em> it isn't raining; second, print whether the temperature is below 50 <em>or</em> it's raining.</p>
+        <div class="target-box"><span class="target-label">Target output</span><pre>True
+False</pre></div>
+      </div>
+      <div class="playground darkbox" id="pgWeatherChallenge" style="margin:0;" data-expected="True&#10;False">
+        <div class="darkbox-chrome"><span></span><span></span><span></span><span class="darkbox-title">your_code.py</span></div>
+        <textarea class="pg-input" spellcheck="false" rows="6">temp = 71
+is_raining = False
+</textarea>
+        <div class="playground-actions">
+          <button class="run-btn pg-run" type="button">Run ▶</button>
+          <button class="run-btn check-btn pg-check" type="button">Check ✓</button>
+        </div>
+        <div class="pg-inputs-panel"></div>
+        <div class="playground-output-label">Output</div>
+        <div class="playground-output pg-output"><span class="placeholder">Press Run or Check…</span></div>
+        <div class="result-banner hidden"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 RECAP ============ -->
+<section class="lesson" id="recap">
+  <div class="wrap">
+    <div class="lesson-head"><div class="lesson-num">11</div><h2>Chapter Recap</h2></div>
+    <p class="lesson-intro">A quick-glance reference for revising later.</p>
+
+    <div class="term-grid compact">
+      <div class="term-card"><h3>== !=</h3><p>equal to, not equal to. Compares by value; a string and a number are never equal.</p></div>
+      <div class="term-card"><h3>&lt; &gt; &lt;= &gt;=</h3><p>ordering. Works on numbers and on strings (lexicographically). Mixed types raise TypeError.</p></div>
+      <div class="term-card"><h3>and</h3><p>True only when both sides are true. Short-circuits on the first False.</p></div>
+      <div class="term-card"><h3>or</h3><p>True when at least one side is true. Short-circuits on the first True.</p></div>
+      <div class="term-card"><h3>not</h3><p>Flips True to False and False to True.</p></div>
+      <div class="term-card"><h3>Precedence</h3><p>arithmetic, then comparisons, then not, then and, then or.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> Python Notes — Chapter 7</div>
+    <p>Relational &amp; Logical Operators</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var fill = document.getElementById('progressFill');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop || document.body.scrollTop;
+    var height = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+    var pct = height > 0 ? (scrolled / height) * 100 : 0;
+    fill.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  /* ================= mini Python interpreter (chapters 1-7) ================= */
+  var PY_KEYWORDS = ['False','None','True','and','as','assert','async','await','break','class',
+    'continue','def','del','elif','else','except','finally','for','from','global','if','import',
+    'in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield'];
+
+  function processEscapes(s){
+    var out = '';
+    for(var i = 0; i < s.length; i++){
+      var c = s[i];
+      if(c === '\\' && i + 1 < s.length){
+        var next = s[i+1];
+        if(next === 'n'){ out += '\n'; i++; }
+        else if(next === 't'){ out += '\t'; i++; }
+        else if(next === '\\'){ out += '\\'; i++; }
+        else if(next === '"'){ out += '"'; i++; }
+        else if(next === "'"){ out += "'"; i++; }
+        else { out += c; }
+      } else { out += c; }
+    }
+    return out;
+  }
+  function formatPyFloat(n){ var s = String(n); if(s.indexOf('.') === -1 && s.indexOf('e') === -1 && s.indexOf('E') === -1) s += '.0'; return s; }
+  function displayValue(v){
+    if(v.pytype === 'str') return v.value;
+    if(v.pytype === 'int') return v.value.toString();
+    if(v.pytype === 'float') return formatPyFloat(v.value);
+    if(v.pytype === 'bool') return v.value ? 'True' : 'False';
+    if(v.pytype === 'type') return v.value;
+    return String(v.value);
+  }
+
+  function scanString(s, startIdx){
+    var quoteChar = s[startIdx];
+    var i = startIdx + 1, content = '';
+    while(i < s.length){
+      var ch = s[i];
+      if(ch === '\\' && i + 1 < s.length){ content += ch + s[i+1]; i += 2; continue; }
+      if(ch === quoteChar) return { value: processEscapes(content), endIndex: i + 1 };
+      content += ch; i++;
+    }
+    return null;
+  }
+
+  function tokenize(s, lineNo){
+    var tokens = [], i = 0;
+    while(i < s.length){
+      var ch = s[i];
+      if(ch === ' ' || ch === '\t'){ i++; continue; }
+      if(ch === '"' || ch === "'"){
+        var strRes = scanString(s, i);
+        if(!strRes) return { error: { error:"SyntaxError: unterminated string literal", note:"Line " + lineNo } };
+        tokens.push({ type:'str', strValue: strRes.value });
+        i = strRes.endIndex; continue;
+      }
+      if(/[0-9]/.test(ch)){
+        var j = i;
+        while(j < s.length && /[0-9]/.test(s[j])) j++;
+        var isFloat = false;
+        if(s[j] === '.' && /[0-9]/.test(s[j+1] || '')){ isFloat = true; j++; while(j < s.length && /[0-9]/.test(s[j])) j++; }
+        var numStr = s.slice(i, j);
+        if(isFloat) tokens.push({ type:'num', isFloat:true, numValue: parseFloat(numStr) });
+        else tokens.push({ type:'num', isFloat:false, bigValue: BigInt(numStr) });
+        i = j; continue;
+      }
+      if(/[A-Za-z_]/.test(ch)){
+        var k = i;
+        while(k < s.length && /[A-Za-z0-9_]/.test(s[k])) k++;
+        tokens.push({ type:'ident', value: s.slice(i, k) });
+        i = k; continue;
+      }
+      if(ch === '*' && s[i+1] === '*'){ tokens.push({ type:'op', value:'**' }); i += 2; continue; }
+      if(ch === '/' && s[i+1] === '/'){ tokens.push({ type:'op', value:'//' }); i += 2; continue; }
+      if(ch === '=' && s[i+1] === '='){ tokens.push({ type:'op', value:'==' }); i += 2; continue; }
+      if(ch === '!' && s[i+1] === '='){ tokens.push({ type:'op', value:'!=' }); i += 2; continue; }
+      if(ch === '<' && s[i+1] === '='){ tokens.push({ type:'op', value:'<=' }); i += 2; continue; }
+      if(ch === '>' && s[i+1] === '='){ tokens.push({ type:'op', value:'>=' }); i += 2; continue; }
+      if(ch === '<' || ch === '>'){ tokens.push({ type:'op', value: ch }); i++; continue; }
+      if(ch === '+' || ch === '-' || ch === '*' || ch === '/' || ch === '%'){ tokens.push({ type:'op', value: ch }); i++; continue; }
+      if(ch === '('){ tokens.push({ type:'lparen' }); i++; continue; }
+      if(ch === ')'){ tokens.push({ type:'rparen' }); i++; continue; }
+      if(ch === '['){ tokens.push({ type:'lbracket' }); i++; continue; }
+      if(ch === ']'){ tokens.push({ type:'rbracket' }); i++; continue; }
+      if(ch === ':'){ tokens.push({ type:'colon' }); i++; continue; }
+      return { error: { error:"SyntaxError: invalid syntax", note:"Line " + lineNo } };
+    }
+    return { error:null, tokens: tokens };
+  }
+
+  function convertToInt(argRes, lineNo){
+    if(argRes.pytype === 'int') return { ok:true, pytype:'int', value: argRes.value };
+    if(argRes.pytype === 'float') return { ok:true, pytype:'int', value: BigInt(Math.trunc(argRes.value)) };
+    if(argRes.pytype === 'bool') return { ok:true, pytype:'int', value: argRes.value ? 1n : 0n };
+    if(argRes.pytype === 'str'){
+      var s = argRes.value.trim();
+      var m = s.match(/^([+-]?)(\d+)$/);
+      if(!m) return { ok:false, error:"ValueError: invalid literal for int() with base 10: '" + argRes.value + "'", note:"Line " + lineNo };
+      return { ok:true, pytype:'int', value: (m[1] === '-' ? -1n : 1n) * BigInt(m[2]) };
+    }
+    return { ok:false, error:"TypeError: int() argument must be a string or a number", note:"Line " + lineNo };
+  }
+  function convertToFloat(argRes, lineNo){
+    if(argRes.pytype === 'float') return { ok:true, pytype:'float', value: argRes.value };
+    if(argRes.pytype === 'int') return { ok:true, pytype:'float', value: Number(argRes.value) };
+    if(argRes.pytype === 'bool') return { ok:true, pytype:'float', value: argRes.value ? 1 : 0 };
+    if(argRes.pytype === 'str'){
+      var s = argRes.value.trim();
+      if(!/^[+-]?(\d+(\.\d+)?|\.\d+)$/.test(s)) return { ok:false, error:"ValueError: could not convert string to float: '" + argRes.value + "'", note:"Line " + lineNo };
+      return { ok:true, pytype:'float', value: parseFloat(s) };
+    }
+    return { ok:false, error:"TypeError: float() argument must be a string or a number", note:"Line " + lineNo };
+  }
+  function convertToBool(argRes){
+    if(argRes.pytype === 'bool') return { ok:true, pytype:'bool', value: argRes.value };
+    if(argRes.pytype === 'int') return { ok:true, pytype:'bool', value: argRes.value !== 0n };
+    if(argRes.pytype === 'float') return { ok:true, pytype:'bool', value: argRes.value !== 0 };
+    if(argRes.pytype === 'str') return { ok:true, pytype:'bool', value: argRes.value !== '' };
+    return { ok:true, pytype:'bool', value: true };
+  }
+  function bigIntFloorDiv(a, b){ var q = a / b, r = a % b; if(r !== 0n && ((r < 0n) !== (b < 0n))) q -= 1n; return q; }
+  function bigIntMod(a, b){ var r = a % b; if(r !== 0n && ((r < 0n) !== (b < 0n))) r += b; return r; }
+  function floatMod(a, b){ var r = a % b; if(r !== 0 && ((r < 0) !== (b < 0))) r += b; return r; }
+
+  function applyBinOp(leftRes, op, rightRes, lineNo){
+    var leftIsStr = leftRes.pytype === 'str';
+    var rightIsStr = rightRes.pytype === 'str';
+    if(op === '+'){
+      if(leftIsStr && rightIsStr) return { ok:true, pytype:'str', value: leftRes.value + rightRes.value };
+      if(leftIsStr && !rightIsStr) return { ok:false, error:'TypeError: can only concatenate str (not "' + rightRes.pytype + '") to str', note:"Line " + lineNo };
+      if(!leftIsStr && rightIsStr) return { ok:false, error:"TypeError: unsupported operand type(s) for +: '" + leftRes.pytype + "' and 'str'", note:"Line " + lineNo };
+    }
+    if(op === '*'){
+      if(leftIsStr && rightRes.pytype === 'int'){ var n = rightRes.value; return { ok:true, pytype:'str', value: n <= 0n ? '' : leftRes.value.repeat(Number(n)) }; }
+      if(rightIsStr && leftRes.pytype === 'int'){ var n2 = leftRes.value; return { ok:true, pytype:'str', value: n2 <= 0n ? '' : rightRes.value.repeat(Number(n2)) }; }
+      if((leftIsStr && rightRes.pytype === 'float') || (rightIsStr && leftRes.pytype === 'float')) return { ok:false, error:"TypeError: can't multiply sequence by non-int of type 'float'", note:"Line " + lineNo };
+      if(leftIsStr && rightIsStr) return { ok:false, error:"TypeError: can't multiply sequence by non-int of type 'str'", note:"Line " + lineNo };
+    }
+    if(leftIsStr || rightIsStr) return { ok:false, error:"TypeError: unsupported operand type(s) for " + op, note:"Line " + lineNo };
+    var leftIsNum = (leftRes.pytype === 'int' || leftRes.pytype === 'float');
+    var rightIsNum = (rightRes.pytype === 'int' || rightRes.pytype === 'float');
+    if(!leftIsNum || !rightIsNum) return { ok:false, error:"TypeError: unsupported operand type(s) for " + op, note:"Line " + lineNo };
+    var bothInt = (leftRes.pytype === 'int' && rightRes.pytype === 'int');
+    if(bothInt){
+      var a = leftRes.value, b = rightRes.value;
+      if(op === '+') return { ok:true, pytype:'int', value: a + b };
+      if(op === '-') return { ok:true, pytype:'int', value: a - b };
+      if(op === '*') return { ok:true, pytype:'int', value: a * b };
+      if(op === '/'){ if(b === 0n) return { ok:false, error:"ZeroDivisionError: division by zero", note:"Line " + lineNo }; return { ok:true, pytype:'float', value: Number(a) / Number(b) }; }
+      if(op === '//'){ if(b === 0n) return { ok:false, error:"ZeroDivisionError: integer division or modulo by zero", note:"Line " + lineNo }; return { ok:true, pytype:'int', value: bigIntFloorDiv(a, b) }; }
+      if(op === '%'){ if(b === 0n) return { ok:false, error:"ZeroDivisionError: integer division or modulo by zero", note:"Line " + lineNo }; return { ok:true, pytype:'int', value: bigIntMod(a, b) }; }
+      if(op === '**'){ if(b < 0n) return { ok:true, pytype:'float', value: Math.pow(Number(a), Number(b)) }; return { ok:true, pytype:'int', value: a ** b }; }
+    } else {
+      var af = (leftRes.pytype === 'int') ? Number(leftRes.value) : leftRes.value;
+      var bf = (rightRes.pytype === 'int') ? Number(rightRes.value) : rightRes.value;
+      if(op === '+') return { ok:true, pytype:'float', value: af + bf };
+      if(op === '-') return { ok:true, pytype:'float', value: af - bf };
+      if(op === '*') return { ok:true, pytype:'float', value: af * bf };
+      if(op === '/'){ if(bf === 0) return { ok:false, error:"ZeroDivisionError: float division by zero", note:"Line " + lineNo }; return { ok:true, pytype:'float', value: af / bf }; }
+      if(op === '//'){ if(bf === 0) return { ok:false, error:"ZeroDivisionError: float floor division by zero", note:"Line " + lineNo }; return { ok:true, pytype:'float', value: Math.floor(af / bf) }; }
+      if(op === '%'){ if(bf === 0) return { ok:false, error:"ZeroDivisionError: float modulo", note:"Line " + lineNo }; return { ok:true, pytype:'float', value: floatMod(af, bf) }; }
+      if(op === '**') return { ok:true, pytype:'float', value: Math.pow(af, bf) };
+    }
+    return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+  }
+
+  function truthyOf(res){
+    if(res.pytype === 'bool') return res.value;
+    if(res.pytype === 'int') return res.value !== 0n;
+    if(res.pytype === 'float') return res.value !== 0;
+    if(res.pytype === 'str') return res.value !== '';
+    return true;
+  }
+  function isNumericType(t){ return t === 'int' || t === 'float' || t === 'bool'; }
+  function numericOf(res){
+    if(res.pytype === 'int') return Number(res.value);
+    if(res.pytype === 'bool') return res.value ? 1 : 0;
+    return res.value;
+  }
+  function applyCompare(leftRes, op, rightRes, lineNo){
+    if(op === '==' || op === '!='){
+      var eq;
+      if(leftRes.pytype === 'str' && rightRes.pytype === 'str') eq = (leftRes.value === rightRes.value);
+      else if(leftRes.pytype === 'str' || rightRes.pytype === 'str') eq = false;
+      else if(isNumericType(leftRes.pytype) && isNumericType(rightRes.pytype)){
+        if(leftRes.pytype === 'int' && rightRes.pytype === 'int') eq = (leftRes.value === rightRes.value);
+        else eq = (numericOf(leftRes) === numericOf(rightRes));
+      } else eq = false;
+      return { ok:true, pytype:'bool', value: op === '==' ? eq : !eq };
+    }
+    if(isNumericType(leftRes.pytype) && isNumericType(rightRes.pytype)){
+      var a = numericOf(leftRes), b = numericOf(rightRes), v;
+      if(op === '<') v = a < b; else if(op === '>') v = a > b; else if(op === '<=') v = a <= b; else v = a >= b;
+      return { ok:true, pytype:'bool', value: v };
+    }
+    if(leftRes.pytype === 'str' && rightRes.pytype === 'str'){
+      var v2;
+      if(op === '<') v2 = leftRes.value < rightRes.value; else if(op === '>') v2 = leftRes.value > rightRes.value;
+      else if(op === '<=') v2 = leftRes.value <= rightRes.value; else v2 = leftRes.value >= rightRes.value;
+      return { ok:true, pytype:'bool', value: v2 };
+    }
+    return { ok:false, error:"TypeError: '" + op + "' not supported between instances of '" + leftRes.pytype + "' and '" + rightRes.pytype + "'", note:"Line " + lineNo };
+  }
+
+  function doIndex(base, indexRes, lineNo){
+    if(base.pytype !== 'str') return { ok:false, error:"TypeError: '" + base.pytype + "' object is not subscriptable", note:"Line " + lineNo };
+    if(indexRes.pytype !== 'int') return { ok:false, error:"TypeError: string indices must be integers", note:"Line " + lineNo };
+    var chars = Array.from(base.value);
+    var n = chars.length;
+    var idx = Number(indexRes.value);
+    var actual = idx >= 0 ? idx : n + idx;
+    if(actual < 0 || actual >= n) return { ok:false, error:"IndexError: string index out of range", note:"Line " + lineNo };
+    return { ok:true, pytype:'str', value: chars[actual] };
+  }
+  function computeSliceBounds(len, startRes, stopRes, stepRes, lineNo){
+    var step = 1;
+    if(stepRes !== null){
+      if(stepRes.pytype !== 'int') return { error:"TypeError: slice indices must be integers or None", note:"Line " + lineNo };
+      step = Number(stepRes.value);
+      if(step === 0) return { error:"ValueError: slice step cannot be zero", note:"Line " + lineNo };
+    }
+    if(startRes !== null && startRes.pytype !== 'int') return { error:"TypeError: slice indices must be integers or None", note:"Line " + lineNo };
+    if(stopRes !== null && stopRes.pytype !== 'int') return { error:"TypeError: slice indices must be integers or None", note:"Line " + lineNo };
+    var start, stop;
+    if(step > 0){
+      start = startRes !== null ? Number(startRes.value) : 0;
+      stop = stopRes !== null ? Number(stopRes.value) : len;
+      start = start < 0 ? Math.max(len + start, 0) : Math.min(start, len);
+      stop = stop < 0 ? Math.max(len + stop, 0) : Math.min(stop, len);
+    } else {
+      start = startRes !== null ? Number(startRes.value) : len - 1;
+      start = start < 0 ? Math.max(len + start, -1) : Math.min(start, len - 1);
+      if(stopRes !== null){
+        stop = Number(stopRes.value);
+        stop = stop < 0 ? Math.max(len + stop, -1) : Math.min(stop, len - 1);
+      } else { stop = -1; }
+    }
+    return { start: start, stop: stop, step: step };
+  }
+  function doSlice(base, startRes, stopRes, stepRes, lineNo){
+    if(base.pytype !== 'str') return { ok:false, error:"TypeError: '" + base.pytype + "' object is not subscriptable", note:"Line " + lineNo };
+    var chars = Array.from(base.value);
+    var bounds = computeSliceBounds(chars.length, startRes, stopRes, stepRes, lineNo);
+    if(bounds.error) return { ok:false, error: bounds.error, note: bounds.note };
+    var out = [];
+    if(bounds.step > 0){ for(var i = bounds.start; i < bounds.stop; i += bounds.step) out.push(chars[i]); }
+    else { for(var j = bounds.start; j > bounds.stop; j += bounds.step) out.push(chars[j]); }
+    return { ok:true, pytype:'str', value: out.join('') };
+  }
+
+  var BUILTINS = ['int', 'float', 'str', 'bool', 'type', 'input', 'len'];
+
+  function Parser(tokens, ctx, lineNo){ this.tokens = tokens; this.pos = 0; this.ctx = ctx; this.lineNo = lineNo; this.error = null; }
+  Parser.prototype.peek = function(){ return this.tokens[this.pos]; };
+  Parser.prototype.fail = function(msg, note){ this.error = { error: msg, note: note || ("Line " + this.lineNo) }; return null; };
+
+  Parser.prototype.parseExpr = function(){
+    var left = this.parseTerm(); if(this.error) return null;
+    while(true){
+      var tok = this.peek();
+      if(tok && tok.type === 'op' && (tok.value === '+' || tok.value === '-')){
+        this.pos++;
+        var right = this.parseTerm(); if(this.error) return null;
+        left = applyBinOp(left, tok.value, right, this.lineNo);
+        if(!left.ok){ this.error = { error:left.error, note:left.note }; return null; }
+      } else break;
+    }
+    return left;
+  };
+
+  /* ---- Chapter 7: comparison / not / and / or, loosest-to-tightest: or > and > not > comparison > arithmetic ---- */
+  Parser.prototype.parseComparison = function(){
+    var left = this.parseExpr(); if(this.error) return null;
+    while(true){
+      var tok = this.peek();
+      if(tok && tok.type === 'op' && (tok.value === '==' || tok.value === '!=' || tok.value === '<' || tok.value === '>' || tok.value === '<=' || tok.value === '>=')){
+        this.pos++;
+        var right = this.parseExpr(); if(this.error) return null;
+        var r = applyCompare(left, tok.value, right, this.lineNo);
+        if(!r.ok){ this.error = { error:r.error, note:r.note }; return null; }
+        left = r;
+      } else break;
+    }
+    return left;
+  };
+  Parser.prototype.parseNot = function(){
+    var tok = this.peek();
+    if(tok && tok.type === 'ident' && tok.value === 'not'){
+      this.pos++;
+      var inner = this.parseNot(); if(this.error) return null;
+      return { ok:true, pytype:'bool', value: !truthyOf(inner) };
+    }
+    return this.parseComparison();
+  };
+  Parser.prototype.parseAnd = function(){
+    var left = this.parseNot(); if(this.error) return null;
+    while(true){
+      var tok = this.peek();
+      if(tok && tok.type === 'ident' && tok.value === 'and'){
+        this.pos++;
+        if(!truthyOf(left)){
+          this.ctx.suppressed = (this.ctx.suppressed || 0) + 1;
+          this.parseNot();
+          this.ctx.suppressed--;
+          if(this.error) return null;
+        } else {
+          var right = this.parseNot(); if(this.error) return null;
+          left = right;
+        }
+      } else break;
+    }
+    return left;
+  };
+  Parser.prototype.parseOr = function(){
+    var left = this.parseAnd(); if(this.error) return null;
+    while(true){
+      var tok = this.peek();
+      if(tok && tok.type === 'ident' && tok.value === 'or'){
+        this.pos++;
+        if(truthyOf(left)){
+          this.ctx.suppressed = (this.ctx.suppressed || 0) + 1;
+          this.parseAnd();
+          this.ctx.suppressed--;
+          if(this.error) return null;
+        } else {
+          var right = this.parseAnd(); if(this.error) return null;
+          left = right;
+        }
+      } else break;
+    }
+    return left;
+  };
+
+  Parser.prototype.parseTerm = function(){
+    var left = this.parseFactor(); if(this.error) return null;
+    while(true){
+      var tok = this.peek();
+      if(tok && tok.type === 'op' && (tok.value === '*' || tok.value === '/' || tok.value === '//' || tok.value === '%')){
+        this.pos++;
+        var right = this.parseFactor(); if(this.error) return null;
+        left = applyBinOp(left, tok.value, right, this.lineNo);
+        if(!left.ok){ this.error = { error:left.error, note:left.note }; return null; }
+      } else break;
+    }
+    return left;
+  };
+  Parser.prototype.parseFactor = function(){
+    var tok = this.peek();
+    if(tok && tok.type === 'op' && tok.value === '-'){
+      this.pos++;
+      var inner = this.parseFactor(); if(this.error) return null;
+      if(inner.pytype === 'int') return { ok:true, pytype:'int', value: -inner.value };
+      if(inner.pytype === 'float') return { ok:true, pytype:'float', value: -inner.value };
+      this.error = { error:"TypeError: bad operand type for unary -", note:"Line " + this.lineNo };
+      return null;
+    }
+    return this.parsePower();
+  };
+  Parser.prototype.parsePower = function(){
+    var base = this.parsePostfix(); if(this.error) return null;
+    var tok = this.peek();
+    if(tok && tok.type === 'op' && tok.value === '**'){
+      this.pos++;
+      var exp = this.parseFactor(); if(this.error) return null;
+      var r = applyBinOp(base, '**', exp, this.lineNo);
+      if(!r.ok){ this.error = { error:r.error, note:r.note }; return null; }
+      return r;
+    }
+    return base;
+  };
+  Parser.prototype.parsePostfix = function(){
+    var base = this.parseAtomBase(); if(this.error) return null;
+    while(this.peek() && this.peek().type === 'lbracket'){
+      base = this.parseSubscript(base); if(this.error) return null;
+    }
+    return base;
+  };
+  Parser.prototype.parseSubscript = function(base){
+    this.pos++;
+    var parts = [null, null, null];
+    var colonCount = 0;
+    if(!(this.peek() && (this.peek().type === 'colon' || this.peek().type === 'rbracket'))){
+      parts[0] = this.parseExpr(); if(this.error) return null;
+    }
+    if(this.peek() && this.peek().type === 'colon'){
+      colonCount++; this.pos++;
+      if(!(this.peek() && (this.peek().type === 'colon' || this.peek().type === 'rbracket'))){
+        parts[1] = this.parseExpr(); if(this.error) return null;
+      }
+      if(this.peek() && this.peek().type === 'colon'){
+        colonCount++; this.pos++;
+        if(!(this.peek() && this.peek().type === 'rbracket')){
+          parts[2] = this.parseExpr(); if(this.error) return null;
+        }
+      }
+    }
+    if(!this.peek() || this.peek().type !== 'rbracket') return this.fail("SyntaxError: invalid syntax", "Line " + this.lineNo + " — missing closing bracket.");
+    this.pos++;
+    if(colonCount === 0){
+      if(parts[0] === null) return this.fail("SyntaxError: invalid syntax");
+      var idxRes = doIndex(base, parts[0], this.lineNo);
+      if(!idxRes.ok){ this.error = { error: idxRes.error, note: idxRes.note }; return null; }
+      return idxRes;
+    } else {
+      var sliceRes = doSlice(base, parts[0], parts[1], parts[2], this.lineNo);
+      if(!sliceRes.ok){ this.error = { error: sliceRes.error, note: sliceRes.note }; return null; }
+      return sliceRes;
+    }
+  };
+  Parser.prototype.parseAtomBase = function(){
+    var tok = this.peek();
+    if(!tok) return this.fail("SyntaxError: invalid syntax");
+    if(tok.type === 'num'){ this.pos++; return tok.isFloat ? { ok:true, pytype:'float', value: tok.numValue } : { ok:true, pytype:'int', value: tok.bigValue }; }
+    if(tok.type === 'str'){ this.pos++; return { ok:true, pytype:'str', value: tok.strValue }; }
+    if(tok.type === 'lparen'){
+      this.pos++;
+      var inner = this.parseOr(); if(this.error) return null;
+      if(!this.peek() || this.peek().type !== 'rparen') return this.fail("SyntaxError: invalid syntax", "Line " + this.lineNo + " — missing closing parenthesis.");
+      this.pos++;
+      return inner;
+    }
+    if(tok.type === 'ident'){
+      if(tok.value === 'True'){ this.pos++; return { ok:true, pytype:'bool', value:true }; }
+      if(tok.value === 'False'){ this.pos++; return { ok:true, pytype:'bool', value:false }; }
+      var next = this.tokens[this.pos + 1];
+      if(BUILTINS.indexOf(tok.value) !== -1 && next && next.type === 'lparen'){
+        var name = tok.value;
+        this.pos += 2;
+        var argRes = null;
+        if(this.peek() && this.peek().type === 'rparen'){ argRes = null; }
+        else { argRes = this.parseOr(); if(this.error) return null; }
+        if(!this.peek() || this.peek().type !== 'rparen') return this.fail("SyntaxError: invalid syntax", "Line " + this.lineNo + " — missing closing parenthesis.");
+        this.pos++;
+        return this.applyBuiltin(name, argRes);
+      }
+      if(PY_KEYWORDS.indexOf(tok.value) !== -1) return this.fail("SyntaxError: invalid syntax", "Line " + this.lineNo + " — '" + tok.value + "' is a reserved keyword.");
+      this.pos++;
+      if(Object.prototype.hasOwnProperty.call(this.ctx.variables, tok.value)){
+        var v = this.ctx.variables[tok.value];
+        return { ok:true, pytype: v.pytype, value: v.value };
+      }
+      return this.fail("NameError: name '" + tok.value + "' is not defined");
+    }
+    return this.fail("SyntaxError: invalid syntax");
+  };
+  Parser.prototype.applyBuiltin = function(name, argRes){
+    if(argRes && !argRes.ok){ this.error = { error: argRes.error, note: argRes.note }; return null; }
+    if(name === 'type'){ if(!argRes) return this.fail("SyntaxError: invalid syntax"); return { ok:true, pytype:'type', value: "<class '" + argRes.pytype + "'>" }; }
+    if(name === 'input'){
+      if(this.ctx.suppressed){ return { ok:true, pytype:'str', value:'' }; }
+      var promptText = argRes ? displayValue(argRes) : '';
+      var userValue = this.ctx.inputQueue.length > 0 ? this.ctx.inputQueue.shift() : '';
+      this.ctx.output += promptText + userValue + '\n';
+      return { ok:true, pytype:'str', value: userValue };
+    }
+    if(name === 'int'){ if(!argRes) return this.fail("TypeError: int() missing argument"); var r = convertToInt(argRes, this.lineNo); if(!r.ok){ this.error = { error:r.error, note:r.note }; return null; } return r; }
+    if(name === 'float'){ if(!argRes) return this.fail("TypeError: float() missing argument"); var rf = convertToFloat(argRes, this.lineNo); if(!rf.ok){ this.error = { error:rf.error, note:rf.note }; return null; } return rf; }
+    if(name === 'str'){ if(!argRes) return { ok:true, pytype:'str', value:'' }; return { ok:true, pytype:'str', value: displayValue(argRes) }; }
+    if(name === 'bool'){ if(!argRes) return { ok:true, pytype:'bool', value:false }; return convertToBool(argRes); }
+    if(name === 'len'){
+      if(!argRes) return this.fail("TypeError: len() missing argument");
+      if(argRes.pytype !== 'str') return this.fail("TypeError: object of type '" + argRes.pytype + "' has no len()");
+      return { ok:true, pytype:'int', value: BigInt(Array.from(argRes.value).length) };
+    }
+    return this.fail("SyntaxError: invalid syntax");
+  };
+
+  function evaluatePiece(pieceStr, ctx, lineNo){
+    var tk = tokenize(pieceStr, lineNo);
+    if(tk.error) return { ok:false, error: tk.error.error, note: tk.error.note };
+    if(tk.tokens.length === 0) return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+    var p = new Parser(tk.tokens, ctx, lineNo);
+    var result = p.parseOr();
+    if(p.error) return { ok:false, error: p.error.error, note: p.error.note };
+    if(p.pos !== tk.tokens.length) return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+    return result;
+  }
+
+  function parseStringLiteral(token){
+    if(token.length < 1) return null;
+    var quoteChar = token[0];
+    if(quoteChar !== '"' && quoteChar !== "'") return null;
+    var i = 1, content = '', closed = false;
+    for(; i < token.length; i++){
+      var ch = token[i];
+      if(ch === '\\' && i + 1 < token.length){ content += ch + token[i+1]; i++; continue; }
+      if(ch === quoteChar){ closed = true; i++; break; }
+      content += ch;
+    }
+    if(!closed) return null;
+    return { raw: content, rest: token.slice(i) };
+  }
+  function splitTopLevel(str){
+    var tokens = [], current = '', inQuote = null, escaped = false, depth = 0;
+    for(var i = 0; i < str.length; i++){
+      var ch = str[i];
+      if(inQuote){
+        current += ch;
+        if(escaped){ escaped = false; }
+        else if(ch === '\\'){ escaped = true; }
+        else if(ch === inQuote){ inQuote = null; }
+      } else {
+        if(ch === '"' || ch === "'"){ inQuote = ch; current += ch; }
+        else if(ch === '(' || ch === '['){ depth++; current += ch; }
+        else if(ch === ')' || ch === ']'){ depth--; current += ch; }
+        else if(ch === ',' && depth === 0){ tokens.push(current); current = ''; }
+        else { current += ch; }
+      }
+    }
+    if(inQuote) return { error: true };
+    tokens.push(current);
+    return { error:false, tokens: tokens };
+  }
+  function parsePrintPiece(token, ctx, lineNo, sepEndState){
+    var kwMatch = token.trim().match(/^(sep|end)\s*=\s*([\s\S]*)$/);
+    if(kwMatch){
+      var kwParsed = parseStringLiteral(kwMatch[2].trim());
+      if(kwParsed === null || kwParsed.rest.trim() !== '') return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo };
+      var kwVal = processEscapes(kwParsed.raw);
+      if(kwMatch[1] === 'sep') sepEndState.sep = kwVal; else sepEndState.end = kwVal;
+      return { ok:true, isKw:true };
+    }
+    var res = evaluatePiece(token, ctx, lineNo);
+    if(!res.ok) return res;
+    return { ok:true, isKw:false, display: displayValue(res) };
+  }
+  function parseLine(rawLine, lineNo, ctx){
+    var trimmed = rawLine.trim();
+    if(trimmed === '' || trimmed.indexOf('#') === 0) return { ok:true };
+    var assignMatch = trimmed.match(/^([A-Za-z_]\w*)\s*=\s*([\s\S]+)$/);
+    if(assignMatch){
+      var varName = assignMatch[1];
+      if(PY_KEYWORDS.indexOf(varName) !== -1) return { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + lineNo + " — '" + varName + "' is a reserved keyword and can't be used as a variable name." };
+      var rhsRes = evaluatePiece(assignMatch[2], ctx, lineNo);
+      if(!rhsRes.ok) return rhsRes;
+      ctx.variables[varName] = { pytype: rhsRes.pytype, value: rhsRes.value };
+      return { ok:true };
+    }
+    var printMatch = trimmed.match(/^print\s*\(([\s\S]*)\)\s*;?\s*$/);
+    if(printMatch){
+      var split = splitTopLevel(printMatch[1]);
+      if(split.error) return { ok:false, error:"SyntaxError: unterminated string literal", note:"Line " + lineNo };
+      var pieces = [];
+      var sepEndState = { sep:' ', end:'\n' };
+      for(var i = 0; i < split.tokens.length; i++){
+        var tkStr = split.tokens[i].trim();
+        if(tkStr === '') continue;
+        var pieceRes = parsePrintPiece(tkStr, ctx, lineNo, sepEndState);
+        if(!pieceRes.ok) return pieceRes;
+        if(!pieceRes.isKw) pieces.push(pieceRes.display);
+      }
+      ctx.output += pieces.join(sepEndState.sep) + sepEndState.end;
+      return { ok:true };
+    }
+    var exprRes = evaluatePiece(trimmed, ctx, lineNo);
+    if(!exprRes.ok) return exprRes;
+    return { ok:true };
+  }
+  function runCode(codeText, inputValues){
+    var ctx = { variables: {}, inputQueue: (inputValues || []).slice(), output: '', suppressed: 0 };
+    var lines = codeText.split('\n');
+    var errorInfo = null;
+    for(var i = 0; i < lines.length; i++){
+      var res;
+      try{ res = parseLine(lines[i], i + 1, ctx); }
+      catch(e){ res = { ok:false, error:"SyntaxError: invalid syntax", note:"Line " + (i+1) }; }
+      if(!res.ok){ errorInfo = res; break; }
+    }
+    return { text: ctx.output, error: errorInfo };
+  }
+
+  function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function renderOutput(outputEl, result){
+    var html = '';
+    if(result.text){ html += escapeHtml(result.text); }
+    if(result.error){
+      html += '<span class="error-line">' + escapeHtml(result.error.error) + '</span>';
+      if(result.error.note){ html += '<span class="error-note">' + escapeHtml(result.error.note) + '</span>'; }
+    }
+    outputEl.innerHTML = html || '<span class="placeholder">(no output)</span>';
+  }
+
+  function detectInputPrompts(code){
+    var re = /input\s*\(([^)]*)\)/g;
+    var prompts = [], m;
+    while((m = re.exec(code))){
+      var inner = m[1].trim();
+      var prompt = '';
+      if(inner){
+        var parsed = parseStringLiteral(inner);
+        if(parsed && parsed.rest.trim() === '') prompt = parsed.raw;
+      }
+      prompts.push(prompt);
+    }
+    return prompts;
+  }
+
+  function refreshInputFields(pg){
+    var textarea = pg.querySelector('.pg-input');
+    var panel = pg.querySelector('.pg-inputs-panel');
+    if(!textarea || !panel) return;
+    var prompts = detectInputPrompts(textarea.value);
+    var oldValues = Array.prototype.map.call(panel.querySelectorAll('input'), function(inp){ return inp.value; });
+    panel.innerHTML = '';
+    if(prompts.length === 0){ panel.style.display = 'none'; return; }
+    panel.style.display = 'flex';
+    prompts.forEach(function(p, idx){
+      var row = document.createElement('div');
+      row.className = 'input-row';
+      var label = document.createElement('label');
+      label.textContent = 'Simulated input ' + (idx + 1) + (p ? ' (' + p.trim() + ')' : '') + ':';
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.value = oldValues[idx] !== undefined ? oldValues[idx] : '';
+      inp.placeholder = 'type a value…';
+      row.appendChild(label);
+      row.appendChild(inp);
+      panel.appendChild(row);
+    });
+  }
+
+  function getInputValues(pg){
+    var panel = pg.querySelector('.pg-inputs-panel');
+    if(!panel) return [];
+    return Array.prototype.map.call(panel.querySelectorAll('input'), function(inp){ return inp.value; });
+  }
+
+  document.querySelectorAll('.playground').forEach(function(pg){
+    var textarea = pg.querySelector('.pg-input');
+    if(!textarea) return;
+    refreshInputFields(pg);
+    textarea.addEventListener('input', function(){ refreshInputFields(pg); });
+  });
+
+  document.querySelectorAll('.playground').forEach(function(pg){
+    var textarea = pg.querySelector('.pg-input');
+    var runBtn = pg.querySelector('.pg-run');
+    var output = pg.querySelector('.pg-output');
+    if(!textarea || !runBtn || !output) return;
+    runBtn.addEventListener('click', function(){
+      renderOutput(output, runCode(textarea.value, getInputValues(pg)));
+    });
+  });
+
+  document.querySelectorAll('.pg-check').forEach(function(btn){
+    var pg = btn.closest('.playground');
+    if(!pg) return;
+    var textarea = pg.querySelector('.pg-input');
+    var output = pg.querySelector('.pg-output');
+    var banner = pg.querySelector('.result-banner');
+    var expected = pg.getAttribute('data-expected') || '';
+    btn.addEventListener('click', function(){
+      var result = runCode(textarea.value, getInputValues(pg));
+      renderOutput(output, result);
+      if(!banner) return;
+      banner.classList.remove('hidden', 'pass', 'fail');
+      if(result.error){ banner.classList.add('fail'); banner.textContent = '❌ There\'s an error above — fix it and check again.'; return; }
+      var actual = (result.text || '').replace(/\n+$/, '');
+      var exp = expected.replace(/\n+$/, '');
+      if(actual === exp){ banner.classList.add('pass'); banner.textContent = '✅ Matches the target output — nicely done!'; }
+      else { banner.classList.add('fail'); banner.textContent = '❌ Not quite yet — compare your output above with the target.'; }
+    });
+  });
+
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    var originalLabel = btn.textContent;
+    btn.addEventListener('click', function(){
+      var targetId = btn.getAttribute('data-target');
+      var target = document.getElementById(targetId);
+      if(!target) return;
+      var nowShowing = target.classList.toggle('show');
+      btn.textContent = nowShowing ? 'Hide' : originalLabel;
+    });
+  });
+
+  document.querySelectorAll('.yesno-card').forEach(function(card){
+    var correctAnswer = card.getAttribute('data-answer');
+    var buttons = card.querySelectorAll('.yesno-btn');
+    var panel = card.querySelector('.answer-panel');
+    var verdictEl = panel ? panel.querySelector('.verdict') : null;
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var choice = btn.getAttribute('data-choice');
+        var isCorrect = (choice === correctAnswer);
+        buttons.forEach(function(b){ b.classList.remove('chosen', 'correct', 'incorrect', 'reveal-correct'); });
+        btn.classList.add('chosen', isCorrect ? 'correct' : 'incorrect');
+        if(!isCorrect){ buttons.forEach(function(b){ if(b.getAttribute('data-choice') === correctAnswer) b.classList.add('reveal-correct'); }); }
+        if(panel) panel.classList.add('show');
+        if(verdictEl){ verdictEl.textContent = isCorrect ? '✅ Correct!' : '❌ Not quite!'; verdictEl.className = 'verdict ' + (isCorrect ? 'correct' : 'incorrect'); }
+      });
+    });
+  });
+
+  /* ================= match-card: click-to-match pairing exercise (new for Chapter 7) ================= */
+  (function setupMatchCards(){
+    var PAIRS = [
+      { sym: '==', meaning: 'equal to' },
+      { sym: '!=', meaning: 'not equal to' },
+      { sym: '<=', meaning: 'less than or equal to' },
+      { sym: 'and', meaning: 'true only when both sides are true' },
+      { sym: 'or', meaning: 'true when at least one side is true' },
+      { sym: 'not', meaning: 'flips True to False, and False to True' }
+    ];
+
+    function shuffle(arr){
+      var a = arr.slice();
+      for(var i = a.length - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    document.querySelectorAll('[data-match]').forEach(function(card){
+      var leftCol = card.querySelector('.match-col.left');
+      var rightCol = card.querySelector('.match-col.right');
+      var doneCount = card.querySelector('.m-done');
+      var totalCount = card.querySelector('.m-total');
+      var doneBanner = card.querySelector('.match-done');
+
+      var leftItems = PAIRS.map(function(p, i){ return { id:i, text:p.sym }; });
+      var rightItems = shuffle(PAIRS.map(function(p, i){ return { id:i, text:p.meaning }; }));
+
+      totalCount.textContent = PAIRS.length;
+      var matchedCount = 0;
+      var selectedLeft = null;
+
+      function makePill(item){
+        var pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'match-pill';
+        pill.textContent = item.text;
+        pill.setAttribute('data-id', item.id);
+        return pill;
+      }
+
+      leftItems.forEach(function(item){ leftCol.appendChild(makePill(item)); });
+      rightItems.forEach(function(item){ rightCol.appendChild(makePill(item)); });
+
+      leftCol.addEventListener('click', function(e){
+        var pill = e.target.closest('.match-pill');
+        if(!pill || pill.classList.contains('matched')) return;
+        var already = card.querySelector('.match-pill.selected');
+        if(already) already.classList.remove('selected');
+        pill.classList.add('selected');
+        selectedLeft = pill;
+      });
+
+      rightCol.addEventListener('click', function(e){
+        var pill = e.target.closest('.match-pill');
+        if(!pill || pill.classList.contains('matched')) return;
+        if(!selectedLeft) return;
+        var correct = selectedLeft.getAttribute('data-id') === pill.getAttribute('data-id');
+        if(correct){
+          selectedLeft.classList.remove('selected');
+          selectedLeft.classList.add('matched');
+          pill.classList.add('matched');
+          selectedLeft = null;
+          matchedCount++;
+          doneCount.textContent = matchedCount;
+          if(matchedCount === PAIRS.length) doneBanner.classList.add('shown');
+        } else {
+          var leftRef = selectedLeft;
+          pill.classList.add('wrong');
+          leftRef.classList.add('wrong');
+          setTimeout(function(){
+            pill.classList.remove('wrong');
+            leftRef.classList.remove('wrong', 'selected');
+            if(selectedLeft === leftRef) selectedLeft = null;
+          }, 420);
+        }
+      });
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>
